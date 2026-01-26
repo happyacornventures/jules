@@ -62,7 +62,8 @@ pub async fn invoke_llama_cli(prompt: &str, stream: bool) -> Result<Option<BufRe
       "--reverse-prompt", "<|im_end|>",
       "-ngl", "28",  // GPU acceleration if available
       "-fa",         // flash attention optimization
-      "-e"           // end-of-text handling
+      "-e",          // end-of-text handling
+      "--no-display-prompt"
     ])
     .stdout(Stdio::piped())
     .stderr(Stdio::null())
