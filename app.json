@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "dd_jules",
-    "slug": "dd_jules",
+    "name": "jules",
+    "slug": "jules",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "ddjules",
+    "scheme": "jules",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
