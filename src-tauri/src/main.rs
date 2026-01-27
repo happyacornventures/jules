@@ -45,7 +45,9 @@ async fn main() {
         use std::io::BufRead;
 
         while buf_reader.read_line(&mut buffer).unwrap() > 0 {
-          print!("{}", buffer);
+          if !buffer.trim().starts_with("> EOF by user") {
+            print!("{}", buffer);
+          }
           buffer.clear();
         }
       },
