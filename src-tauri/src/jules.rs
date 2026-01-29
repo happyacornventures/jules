@@ -75,21 +75,6 @@ pub async fn invoke_llama_cli(prompt: &str, stream: bool) -> Result<Option<Box<d
   let mut aggregated_output = String::new();
 
   if stream {
-    // Stream mode: read character by character for real-time output
-    // use std::io::Read;
-    // let mut reader = stdout;
-    // let mut buffer = [0; 1]; // Read one byte at a time
-
-    // while let Ok(bytes_read) = reader.read(&mut buffer) {
-    //   if bytes_read == 0 {
-    //     break; // EOF
-    //   }
-
-    //   let ch = buffer[0] as char;
-    //   print!("{}", ch); // Print each character immediately
-    //   std::io::stdout().flush()?; // Force immediate output
-    //   aggregated_output.push(ch);
-    // }
     return Ok(Some(Box::new(BufReader::new(stdout))));
   } else {
     // Non-stream mode: collect all output first
