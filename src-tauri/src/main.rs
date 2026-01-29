@@ -54,8 +54,6 @@ async fn main() {
       Ok(None) => println!("No output from process."),
       Err(e) => eprintln!("Error executing external process: {}", e),
     }
-
-    println!("Hello World");
   } else {
     app_lib::run();
   }
