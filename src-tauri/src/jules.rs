@@ -1,5 +1,5 @@
 use std::fs;
-use std::io::{Write, BufRead, BufReader, Read};
+use std::io::{Write, BufRead, BufReader, Read, Cursor};
 use std::process::{Command, Stdio};
 use futures_util::StreamExt;
 use indicatif::{ProgressBar, ProgressStyle};
@@ -105,7 +105,8 @@ pub async fn invoke_llama_cli(prompt: &str, stream: bool) -> Result<Option<Box<d
 
   if status.success() {
     if !stream {
-      println!("Process output: {}", aggregated_output);
+      let cursor = Cursor::new(aggregated_output.into_bytes());
+      return Ok(Some(Box::new(BufReader::new(cursor))));
     }
   } else {
     eprintln!("Process failed");
