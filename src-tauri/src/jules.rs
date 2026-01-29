@@ -43,7 +43,7 @@ pub async fn download_model(model_path: &str, model_url: &str) -> Result<(), Box
   Ok(())
 }
 
-pub async fn invoke_llama_cli(prompt: &str, stream: bool) -> Result<Option<BufReader<std::process::ChildStdout>>, Box<dyn std::error::Error>> {
+pub async fn invoke_llama_cli(prompt: &str, stream: bool) -> Result<Option<Box<dyn BufRead>>, Box<dyn std::error::Error>> {
   /** reference prompt
   ./llama-cli -m qwen2-1_5b-instruct-q5_k_m.gguf \
   -n 512 -co -i -if -f prompts/chat-with-qwen.txt \
@@ -90,7 +90,7 @@ pub async fn invoke_llama_cli(prompt: &str, stream: bool) -> Result<Option<BufRe
     //   std::io::stdout().flush()?; // Force immediate output
     //   aggregated_output.push(ch);
     // }
-    return Ok(Some(BufReader::new(stdout)));
+    return Ok(Some(Box::new(BufReader::new(stdout))));
   } else {
     // Non-stream mode: collect all output first
     let reader = BufReader::new(stdout);
