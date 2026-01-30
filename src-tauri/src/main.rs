@@ -46,6 +46,10 @@ async fn main() {
 
     if let Some(ctx) = &context {
       println!("Context: {}", ctx);
+      let context_content: String = read_file(ctx).unwrap_or_else(|e| {
+        eprintln!("Error reading context file: {}", e);
+        String::new()
+      });
     }
 
     // Find the prompt (first non-flag argument)
