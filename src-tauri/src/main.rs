@@ -1,9 +1,27 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+use std::io::Error;
+use std::fs::File;
+use std::io::Read;
+
 mod jules;
 
 use jules::{model_exists, download_model, invoke_llama_cli};
+
+fn read_file(file_name: &str) -> Result<String, Error> {
+    let mut buffer = String::new();
+    let mut file = match File::open(file_name) {
+        Ok(file) => file,
+        Err(_) => {
+          eprintln!("Error opening file: {}", file_name);
+          return Err(std::io::Error::new(std::io::ErrorKind::NotFound, "File not found"));
+        }
+    };
+
+    file.read_to_string(&mut buffer)?;
+    Ok(buffer)
+}
 
 #[tokio::main]
 async fn main() {
