@@ -54,6 +54,15 @@ async fn main() {
       });
     }
 
+    println!("Prompt: {}", context_content);
+
+    // alternate between user and assistant tags for each line in context
+    let conversation: String = context_content.split("\n")
+      .filter(|line| !line.trim().is_empty())
+      .collect::<Vec<&str>>().into_iter().map(|line| format!("<|im_start|>user\n{}<|im_end|>", line)).collect::<String>();
+
+    println!("{}", conversation);
+
     // Find the prompt (first non-flag argument)
     let prompt = args.iter()
       .skip(1)
