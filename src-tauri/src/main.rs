@@ -44,9 +44,11 @@ async fn main() {
       .and_then(|i| args[i].strip_prefix("--context="))
       .map(|s| s.to_string());
 
+    let mut context_content: String = String::new();
+
     if let Some(ctx) = &context {
       println!("Context: {}", ctx);
-      let context_content: String = read_file(ctx).unwrap_or_else(|e| {
+      context_content = read_file(ctx).unwrap_or_else(|e| {
         eprintln!("Error reading context file: {}", e);
         String::new()
       });
