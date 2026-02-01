@@ -1,12 +1,6 @@
-use std::collections::HashMap;
 use std::fs::{self, create_dir_all, File};
-use std::io::prelude::*;
-use std::io::Result;
-use std::sync::Mutex;
-use std::time::{SystemTime, UNIX_EPOCH};
-
+use std::io::{Result, Read};
 use serde_json::{json, Value};
-use tauri::Manager;
 
 pub fn write_file(file_name: &str, content: &Value) -> Result<()> {
     let data = json!(content);
