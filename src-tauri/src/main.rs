@@ -5,6 +5,7 @@ use std::io::Error;
 use std::io::Read;
 
 mod jules;
+mod file;
 
 use jules::{model_exists, download_model, invoke_llama_cli};
 
