@@ -3,6 +3,9 @@ use std::io::{Write, BufRead, BufReader, Read, Cursor};
 use std::process::{Command, Stdio};
 use futures_util::StreamExt;
 use indicatif::{ProgressBar, ProgressStyle};
+use serde_json::{json, Value};
+
+use crate::file::{read_file, write_file};
 
 pub fn model_exists(model_path: &str) -> bool {
   std::path::Path::new(&format!("{}/model.gguf", model_path)).exists()
