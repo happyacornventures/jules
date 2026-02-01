@@ -2,20 +2,36 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use std::io::Error;
-use std::fs::File;
 use std::io::Read;
 
 mod jules;
 
 use jules::{model_exists, download_model, invoke_llama_cli};
 
-fn read_file(file_name: &str) -> Result<String, Error> {
+use std::collections::HashMap;
+use std::fs::{self, create_dir_all, File};
+use std::io::prelude::*;
+use std::io::Result;
+use std::sync::Mutex;
+use std::time::{SystemTime, UNIX_EPOCH};
+
+use serde_json::{json, Value};
+use tauri::Manager;
+
+fn write_file(file_name: &str, content: &Value) -> Result<()> {
+    let data = json!(content);
+    File::create(file_name)?;
+    fs::write(file_name, data.to_string())?;
+    Ok(())
+}
+
+fn read_file(file_name: &str, default_value: Value) -> Result<String> {
     let mut buffer = String::new();
     let mut file = match File::open(file_name) {
         Ok(file) => file,
         Err(_) => {
-          eprintln!("Error opening file: {}", file_name);
-          return Err(std::io::Error::new(std::io::ErrorKind::NotFound, "File not found"));
+            write_file(file_name, &default_value)?;
+            File::open(file_name)?
         }
     };
 
@@ -48,7 +64,7 @@ async fn main() {
 
     if let Some(ctx) = &context {
       println!("Context: {}", ctx);
-      context_content = read_file(ctx).unwrap_or_else(|e| {
+      context_content = read_file(ctx, json!({})).unwrap_or_else(|e| {
         eprintln!("Error reading context file: {}", e);
         String::new()
       });
