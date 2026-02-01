@@ -18,26 +18,8 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use serde_json::{json, Value};
 use tauri::Manager;
 
-fn write_file(file_name: &str, content: &Value) -> Result<()> {
-    let data = json!(content);
-    File::create(file_name)?;
-    fs::write(file_name, data.to_string())?;
-    Ok(())
-}
-
-fn read_file(file_name: &str, default_value: Value) -> Result<String> {
-    let mut buffer = String::new();
-    let mut file = match File::open(file_name) {
-        Ok(file) => file,
-        Err(_) => {
-            write_file(file_name, &default_value)?;
-            File::open(file_name)?
-        }
-    };
-
-    file.read_to_string(&mut buffer)?;
-    Ok(buffer)
-}
+mod file;
+use file::{read_file, write_file};
 
 #[tokio::main]
 async fn main() {
