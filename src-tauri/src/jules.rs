@@ -93,6 +93,7 @@ pub async fn invoke_llama_cli(prompt: &str, stream: bool) -> Result<Option<Box<d
 
   if status.success() {
     if !stream {
+      write_file("output.json", &json!({"prompt": prompt, "response": aggregated_output}))?;
       return Ok(Some(Box::new(BufReader::new(Cursor::new(aggregated_output.into_bytes())))));
     }
   } else {
