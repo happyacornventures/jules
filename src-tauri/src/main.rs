@@ -68,6 +68,12 @@ async fn main() {
       .map(|s| s.as_str())
       .unwrap_or("");
 
+    let full_prompt = if context_content.is_empty() {
+      prompt.to_string()
+    } else {
+      format!("{}\n\n{}", context_content, prompt)
+    };
+
     // pass arg as query to invoke_llama_cli
     match invoke_llama_cli(&format!("{}\n\n{}", context_content, prompt), stream).await {
       Ok(Some(reader)) => {
