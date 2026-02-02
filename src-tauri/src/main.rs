@@ -19,7 +19,6 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use serde_json::{json, Value};
 use tauri::Manager;
 
-mod file;
 use file::{read_file, write_file};
 
 #[tokio::main]
