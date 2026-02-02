@@ -75,7 +75,7 @@ async fn main() {
     };
 
     // pass arg as query to invoke_llama_cli
-    match invoke_llama_cli(&format!("{}\n\n{}", context_content, prompt), stream).await {
+    match invoke_llama_cli(&full_prompt, stream).await {
       Ok(Some(reader)) => {
         let mut buf_reader = reader;
         let mut buffer = String::new();
