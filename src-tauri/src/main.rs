@@ -52,8 +52,6 @@ async fn main() {
       });
     }
 
-    println!("Prompt: {}", context_content);
-
     // alternate between user and assistant tags for each line in context
     // let conversation: String = context_content.split("\n")
     //   .filter(|line| !line.trim().is_empty())
