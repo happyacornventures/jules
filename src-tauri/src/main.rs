@@ -96,6 +96,7 @@ async fn main() {
         match invoke_llama_cli(&full_prompt, stream).await {
             Ok(Some(reader)) => {
                 let mut buf_reader = reader;
+                let mut aggregated_output = String::new();
                 let mut buffer = String::new();
                 use std::io::BufRead;
 
@@ -103,8 +104,15 @@ async fn main() {
                     if !buffer.trim().starts_with("> EOF by user") && !buffer.trim().is_empty() {
                         print!("{}", buffer);
                     }
+                    aggregated_output.push_str(&buffer);
+                    aggregated_output.push('\n');
                     buffer.clear();
                 }
+
+                machine.consume(
+                    "messages_exchanged".to_string(),
+                    Some(json!({"prompt": full_prompt, "response": aggregated_output}).to_string()),
+                );
             }
             Ok(None) => println!("No output from process."),
             Err(e) => eprintln!("Error executing external process: {}", e),
