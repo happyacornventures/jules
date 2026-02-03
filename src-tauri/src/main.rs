@@ -6,6 +6,7 @@ use std::io::Read;
 
 mod jules;
 mod file;
+mod hermenia;
 
 use jules::{model_exists, download_model, invoke_llama_cli};
 
