@@ -9,6 +9,7 @@ mod file;
 mod hermenia;
 
 use jules::{model_exists, download_model, invoke_llama_cli};
+use hermenia::Machine;
 
 use std::collections::HashMap;
 use std::fs::{self, create_dir_all, File};
@@ -22,6 +23,13 @@ use tauri::Manager;
 
 use file::{read_file, write_file};
 
+fn state_identity(state: Value, event: Value) -> Value {
+    // This function is a placeholder for state that does not change
+    // It simply returns the state as is, without modification
+    println!("State identity called with event: {}", event);
+    state
+}
+
 #[tokio::main]
 async fn main() {
   let args: Vec<String> = std::env::args().collect();
@@ -32,6 +40,16 @@ async fn main() {
       std::process::exit(1);
     }
   }
+
+  let data: HashMap<String, Value> = HashMap::from([
+      ("messages".to_string(), json!({})),
+  ]);
+  let mut listeners: Vec<Box<dyn Fn(&str, &Value, &Value) + Send + Sync>> = Vec::new();
+  let reducers: HashMap<String, (Value, fn(Value, Value) -> Value)> = HashMap::from([
+      ("messages".to_string(), (json!({}), state_identity as fn(Value, Value) -> Value)),
+  ]);
+
+  let machine = Machine::new(data, reducers, Mutex::new(std::mem::take(&mut listeners)));
 
   if args.len() > 1 {
     // Check if --stream flag is present
