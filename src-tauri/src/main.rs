@@ -129,7 +129,7 @@ async fn main() {
                 }
 
                 machine.consume(
-                    "messages_exchanged".to_string(),
+                    "exchange_created".to_string(),
                     Some(json!({"prompt": full_prompt, "response": aggregated_output}).to_string()),
                 );
             }
