@@ -60,11 +60,11 @@ async fn main() {
     }
     }
 
-    let data: HashMap<String, Value> = HashMap::from([("messages".to_string(), json!({}))]);
+    let data: HashMap<String, Value> = HashMap::from([("exchanges".to_string(), json!({}))]);
     let mut listeners: Vec<Box<dyn Fn(&str, &Value, &Value) + Send + Sync>> = Vec::new();
     let reducers: HashMap<String, (Value, fn(Value, Value) -> Value)> = HashMap::from([(
-        "messages".to_string(),
-        (json!({}), state_identity as fn(Value, Value) -> Value),
+        "exchanges".to_string(),
+        (json!({}), exchange_reducer as fn(Value, Value) -> Value),
     )]);
 
     let machine = Machine::new(data, reducers, Mutex::new(std::mem::take(&mut listeners)));
