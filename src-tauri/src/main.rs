@@ -30,6 +30,25 @@ fn state_identity(state: Value, event: Value) -> Value {
     state
 }
 
+fn exchange_reducer(state: Value, event: Value) -> Value {
+    let mut new_state = state.clone();
+
+    match event["type"].as_str().unwrap() {
+        "exchange_created" => {
+            new_state.as_object_mut().unwrap().insert(
+                event["id"].as_str().unwrap().to_string(),
+                event["payload"].clone(),
+            );
+            println!("New state: {:?}", new_state);
+            return new_state;
+        }
+        _ => {
+            println!("Unknown command: {}", event["type"].as_str().unwrap());
+        }
+    }
+    state
+}
+
 #[tokio::main]
 async fn main() {
     let args: Vec<String> = std::env::args().collect();
