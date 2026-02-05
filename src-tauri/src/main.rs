@@ -3,6 +3,7 @@
 
 use std::io::Error;
 use std::io::Read;
+use uuid::Uuid;
 
 mod file;
 mod hermenia;
