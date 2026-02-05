@@ -39,7 +39,7 @@ fn exchange_reducer(state: Value, event: Value) -> Value {
                 event["id"].as_str().unwrap().to_string(),
                 event["payload"].clone(),
             );
-            println!("New state: {:?}", new_state);
+            // println!("New state: {:?}", new_state);
             return new_state;
         }
         _ => {
