@@ -37,11 +37,11 @@ fn exchange_reducer(state: Value, event: Value) -> Value {
     match event["type"].as_str().unwrap() {
         "exchange_created" => {
             let mut payload = event["payload"].clone();
-            if payload.as_object().and_then(|p| p.get("conversation_id")).is_none() {
-                let conversation_id = Uuid::new_v4().to_string();
+            if payload.as_object().and_then(|p| p.get("conversation")).is_none() {
+                let conversation = Uuid::new_v4().to_string();
                 payload.as_object_mut().unwrap().insert(
                     "conversation".to_string(),
-                    json!(conversation_id),
+                    json!(conversation),
                 );
             }
             new_state.as_object_mut().unwrap().insert(
