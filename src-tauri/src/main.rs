@@ -46,7 +46,7 @@ fn exchange_reducer(state: Value, event: Value) -> Value {
             }
             new_state.as_object_mut().unwrap().insert(
                 event["id"].as_str().unwrap().to_string(),
-                event["payload"].clone(),
+                payload,
             );
             // println!("New state: {:?}", new_state);
             return new_state;
