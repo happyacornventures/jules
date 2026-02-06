@@ -96,6 +96,10 @@ async fn main() {
             .and_then(|i| args[i].strip_prefix("--conversation="))
             .map(|s| s.to_string());
 
+        const exchanges = machine.consume("exchanges_requested".to_string(), None)["exchanges"]
+            .as_object()
+            .unwrap();
+
         let mut context_content: String = String::new();
 
         if let Some(ctx) = &context {
