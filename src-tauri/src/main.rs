@@ -89,6 +89,13 @@ async fn main() {
             .and_then(|i| args[i].strip_prefix("--context="))
             .map(|s| s.to_string());
 
+        // Check if --context flag is present and capture its value
+        let convo_id = args
+            .iter()
+            .position(|arg| arg.starts_with("--conversation="))
+            .and_then(|i| args[i].strip_prefix("--conversation="))
+            .map(|s| s.to_string());
+
         let mut context_content: String = String::new();
 
         if let Some(ctx) = &context {
