@@ -82,6 +82,18 @@ async fn main() {
 
     let machine = Machine::new(data, reducers, Mutex::new(std::mem::take(&mut listeners)));
 
+    let events_str = read_file("exchanges.json", json!({})).unwrap();
+
+    let events: HashMap<String, Value> = serde_json::from_str(&events_str).unwrap();
+    let mut sorted_events: Vec<_> = events.values().collect();
+    sorted_events.sort_by_key(|e| e["createTime"].as_u64());
+
+    for event in sorted_events {
+        let event_type = event["type"].as_str().unwrap().to_string();
+        let payload = event["payload"].to_string();
+        machine.consume(event_type, Some(payload));
+    }
+
     if args.len() > 1 {
         // Check if --stream flag is present
         let stream = args.contains(&"--stream".to_string());
