@@ -112,10 +112,9 @@ async fn main() {
             .and_then(|i| args[i].strip_prefix("--conversation="))
             .map(|s| s.to_string());
 
-        const exchanges: HashMap<String, Value> = machine
-            .consume("exchanges_requested".to_string(), None)["exchanges"]
-            .as_object()
-            .unwrap();
+        let exchanges: String = machine.consume("exchanges_requested".to_string(), None);
+
+        let exchanges_map: HashMap<String, Value> = serde_json::from_str(&exchanges).unwrap();
 
         let mut context_content: String = String::new();
 
