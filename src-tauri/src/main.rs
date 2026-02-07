@@ -119,6 +119,14 @@ async fn main() {
 
         let mut relevant_exchanges: Vec<Value> = Vec::new();
 
+        if let Some(convo_id) = convo_id {
+            for (_, exchange) in exchanges_iter {
+                if exchange["conversation"].as_str().unwrap() == convo_id {
+                    relevant_exchanges.push(exchange.clone());
+                }
+            }
+        }
+
         let mut context_content: String = String::new();
 
         if let Some(ctx) = &context {
