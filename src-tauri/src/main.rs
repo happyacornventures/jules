@@ -158,9 +158,9 @@ async fn main() {
                 while buf_reader.read_line(&mut buffer).unwrap() > 0 {
                     if !buffer.trim().starts_with("> EOF by user") && !buffer.trim().is_empty() {
                         print!("{}", buffer);
+                        aggregated_output.push_str(&buffer);
+                        aggregated_output.push('\n');
                     }
-                    aggregated_output.push_str(&buffer);
-                    aggregated_output.push('\n');
                     buffer.clear();
                 }
 
