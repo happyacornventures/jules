@@ -43,7 +43,7 @@ impl Machine {
     pub fn consume(&self, event: String, payload: Option<String>) -> String {
         let mut data = self.data.lock().unwrap();
         let payload_str = payload.as_deref().unwrap_or("{}");
-        let hydrated_event = hydrate_event(event.to_string(), payload_str);
+        let mut hydrated_event = hydrate_event(event.to_string(), payload_str);
 
         for (key, value) in data.iter_mut() {
             if let Some((_initial_value, reducer)) = self.reducers.get(key) {
