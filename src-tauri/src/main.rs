@@ -31,6 +31,14 @@ fn state_identity(state: Value, event: Value) -> Value {
     state
 }
 
+fn persist_events(key: &str, value: &Value, event: &Value) {
+    let existing_events_str = read_file("exchanges.json", json!({})).unwrap();
+    let mut events: HashMap<String, Value> = serde_json::from_str(&existing_events_str).unwrap();
+    let event_id = event["id"].as_str().unwrap().to_string();
+    events.insert(event_id, event.clone());
+    write_file("exchanges.json", &json!(events)).expect("Failed to write to events file");
+}
+
 fn exchange_reducer(state: Value, event: Value) -> Value {
     let mut new_state = state.clone();
 
