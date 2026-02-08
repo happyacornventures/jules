@@ -183,6 +183,8 @@ async fn main() {
             Ok(None) => println!("No output from process."),
             Err(e) => eprintln!("Error executing external process: {}", e),
         }
+
+        println!("{}", json!(machine.consume("".to_string(), None)));
     } else {
         app_lib::run();
     }
