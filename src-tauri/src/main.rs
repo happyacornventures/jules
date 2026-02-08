@@ -36,10 +36,11 @@ fn persist_events(key: &str, value: &Value, event: &Value) {
     let mut events: HashMap<String, Value> = serde_json::from_str(&existing_events_str).unwrap();
     let event_id = event["id"].as_str().unwrap().to_string();
     events.insert(event_id, event.clone());
+    println!("Persisting event: {}", event);
     write_file("exchanges.json", &json!(events)).expect("Failed to write to events file");
 }
 
-fn exchange_reducer(state: Value, mut event: Value) -> Value {
+fn exchange_reducer(state: Value, event: &mut Value) -> Value {
     let mut new_state = state.clone();
 
     match event["type"].as_str().unwrap() {
@@ -82,9 +83,9 @@ async fn main() {
 
     let data: HashMap<String, Value> = HashMap::from([("exchanges".to_string(), json!({}))]);
     let mut listeners: Vec<Box<dyn Fn(&str, &Value, &Value) + Send + Sync>> = Vec::new();
-    let reducers: HashMap<String, (Value, fn(Value, Value) -> Value)> = HashMap::from([(
+    let reducers: HashMap<String, (Value, fn(Value, &mut Value) -> Value)> = HashMap::from([(
         "exchanges".to_string(),
-        (json!({}), exchange_reducer as fn(Value, Value) -> Value),
+        (json!({}), exchange_reducer as fn(Value, &mut Value) -> Value),
     )]);
 
     let machine = Machine::new(data, reducers, Mutex::new(std::mem::take(&mut listeners)));
