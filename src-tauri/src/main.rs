@@ -39,7 +39,7 @@ fn persist_events(key: &str, value: &Value, event: &Value) {
     write_file("exchanges.json", &json!(events)).expect("Failed to write to events file");
 }
 
-fn exchange_reducer(state: Value, event: Value) -> Value {
+fn exchange_reducer(state: Value, mut event: Value) -> Value {
     let mut new_state = state.clone();
 
     match event["type"].as_str().unwrap() {
