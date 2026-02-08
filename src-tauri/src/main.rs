@@ -125,6 +125,8 @@ async fn main() {
         let exchanges: String = machine.consume("exchanges_requested".to_string(), None);
 
         let exchanges_map: HashMap<String, Value> = serde_json::from_str(&exchanges).unwrap();
+        let exchanges_values: &Value = exchanges_map.get("exchanges").unwrap();
+
         let mut exchanges_iter = exchanges_map.iter();
 
         let mut relevant_exchanges: Vec<Value> = Vec::new();
