@@ -102,6 +102,8 @@ async fn main() {
         machine.consume(event_type, Some(payload));
     }
 
+    machine.subscribe(Box::new(persist_events));
+
     if args.len() > 1 {
         // Check if --stream flag is present
         let stream = args.contains(&"--stream".to_string());
