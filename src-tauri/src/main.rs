@@ -132,7 +132,7 @@ async fn main() {
 
         let mut relevant_exchanges: Vec<Value> = Vec::new();
 
-        if let Some(convo_id) = convo_id {
+        if let Some(ref convo_id) = convo_id {
             for (_, exchange) in exchanges_iter {
                 if exchange["conversation"].as_str().unwrap() == convo_id {
                     relevant_exchanges.push(exchange.clone());
@@ -190,7 +190,7 @@ async fn main() {
 
                 machine.consume(
                     "exchange_created".to_string(),
-                    Some(json!({"prompt": full_prompt, "response": aggregated_output}).to_string()),
+                    Some(json!({"prompt": full_prompt, "response": aggregated_output, "conversation": convo_id}).to_string()),
                 );
             }
             Ok(None) => println!("No output from process."),
