@@ -49,7 +49,7 @@ fn exchange_reducer(state: Value, event: &mut Value) -> Value {
             if payload
                 .as_object()
                 .and_then(|p| p.get("conversation"))
-                .is_none()
+                .map_or(true, |v| v.is_null())
             {
                 let conversation = Uuid::new_v4().to_string();
                 payload
