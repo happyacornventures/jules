@@ -203,7 +203,7 @@ async fn main() {
 
                 machine.consume(
                     "exchange_created".to_string(),
-                    Some(json!({"prompt": full_prompt, "response": aggregated_output, "conversation": convo_id}).to_string()),
+                    Some(json!({"prompt": prompt, "response": aggregated_output, "conversation": convo_id}).to_string()),
                 );
             }
             Ok(None) => println!("No output from process."),
