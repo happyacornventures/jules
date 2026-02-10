@@ -179,9 +179,9 @@ async fn main() {
             .unwrap_or("");
 
         let full_prompt = if context_content.is_empty() {
-            prompt.to_string()
+            format!("{}\n{}", full_convo, prompt.to_string())
         } else {
-            format!("{}\n\n{}", context_content, prompt)
+            format!("{}\n{}\n\n{}", full_convo, context_content, prompt)
         };
 
         // pass arg as query to invoke_llama_cli
