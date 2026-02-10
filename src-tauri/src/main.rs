@@ -140,6 +140,19 @@ async fn main() {
             }
         }
 
+        let full_convo: String = relevant_exchanges
+            .iter()
+            .map(|exchange| {
+                let prompt = exchange["prompt"].as_str().unwrap_or("");
+                let response = exchange["response"].as_str().unwrap_or("").trim();
+                format!(
+                    "<|im_start|>user\n{}<|im_end|>\n<|im_start|>assistant\n{}<|im_end|>",
+                    prompt, response
+                )
+            })
+            .collect::<Vec<String>>()
+            .join("\n");
+
         let mut context_content: String = String::new();
 
         if let Some(ctx) = &context {
