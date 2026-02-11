@@ -184,6 +184,12 @@ async fn main() {
             format!("{}\n\n{}", context_content, prompt)
         };
 
+        let full_prompt = if full_convo.is_empty() {
+            format!("<|im_start|>user\n{}<|im_end|>\n<|im_start|>assistant\n", new_prompt)
+        } else {
+            format!("{}<|im_start|>user\n{}<|im_end|>\n<|im_start|>assistant\n", full_convo, new_prompt)
+        };
+
         // pass arg as query to invoke_llama_cli
         match invoke_llama_cli(&full_prompt, stream).await {
             Ok(Some(reader)) => {
