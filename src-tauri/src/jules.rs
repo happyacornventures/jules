@@ -67,10 +67,7 @@ pub async fn invoke_llama_cli(
             "-m",
             "models/model.gguf",
             "-p",
-            &format!(
-                "<|im_start|>user\n{}<|im_end|>\n<|im_start|>assistant\n",
-                prompt
-            ),
+            prompt,
             "-n",
             "1000",
             "--reverse-prompt",
