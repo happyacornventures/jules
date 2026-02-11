@@ -25,9 +25,6 @@ use tauri::Manager;
 use file::{read_file, write_file};
 
 fn state_identity(state: Value, event: Value) -> Value {
-    // This function is a placeholder for state that does not change
-    // It simply returns the state as is, without modification
-    println!("State identity called with event: {}", event);
     state
 }
 
@@ -36,7 +33,6 @@ fn persist_events(key: &str, value: &Value, event: &Value) {
     let mut events: HashMap<String, Value> = serde_json::from_str(&existing_events_str).unwrap();
     let event_id = event["id"].as_str().unwrap().to_string();
     events.insert(event_id, event.clone());
-    println!("Persisting event: {}", event);
     write_file("exchanges.json", &json!(events)).expect("Failed to write to events file");
 }
 
@@ -156,7 +152,6 @@ async fn main() {
         let mut context_content: String = String::new();
 
         if let Some(ctx) = &context {
-            println!("Context: {}", ctx);
             context_content = read_file(ctx, json!({})).unwrap_or_else(|e| {
                 eprintln!("Error reading context file: {}", e);
                 String::new()
@@ -167,8 +162,6 @@ async fn main() {
         // let conversation: String = context_content.split("\n")
         //   .filter(|line| !line.trim().is_empty())
         //   .collect::<Vec<&str>>().into_iter().map(|line| format!("<|im_start|>user\n{}<|im_end|>", line)).collect::<String>();
-
-        // println!("{}", conversation);
 
         // Find the prompt (first non-flag argument)
         let prompt = args
@@ -215,8 +208,6 @@ async fn main() {
             Ok(None) => println!("No output from process."),
             Err(e) => eprintln!("Error executing external process: {}", e),
         }
-
-        println!("{}", json!(machine.consume("".to_string(), None)));
     } else {
         app_lib::run();
     }
