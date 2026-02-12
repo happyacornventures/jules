@@ -65,4 +65,8 @@ impl Machine {
     pub fn subscribe(&self, callback: Box<dyn Fn(&str, &Value, &Value) + Send + Sync>) {
         self.listeners.lock().unwrap().push(callback);
     }
+
+    pub fn interpret(&self, callback: Box<dyn Fn(&Value) -> Value + Send + Sync>) {
+        self.interpreters.lock().unwrap().push(callback);
+    }
 }
