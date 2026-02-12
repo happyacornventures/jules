@@ -8,7 +8,7 @@ pub struct Machine {
     pub data: Mutex<HashMap<String, Value>>,
     pub reducers: HashMap<String, (Value, fn(Value, &mut Value) -> Value)>,
     pub listeners: Mutex<Vec<Box<dyn Fn(&str, &Value, &Value) + Send + Sync>>>,
-    pub interpreters: Mutex<Vec<Box<dyn Fn(&str, &Value) -> Value + Send + Sync>>>,
+    pub interpreters: Mutex<Vec<Box<dyn Fn(&Value) -> Value + Send + Sync>>>,
 }
 
 fn hydrate_event(event: String, payload: &str) -> Value {
