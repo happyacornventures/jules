@@ -124,6 +124,7 @@ async fn main() {
             .map(|s| s.to_string());
 
         let exchanges: String = machine.consume("exchanges_requested".to_string(), None);
+        let other_exchanges = machine.other_consume(json!({"type": "exchanges_requested", "payload": {}}));
 
         let exchanges_map: HashMap<String, Value> = serde_json::from_str(&exchanges).unwrap();
         let exchanges_values: &Value = exchanges_map.get("exchanges").unwrap();
