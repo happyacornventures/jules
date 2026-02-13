@@ -42,6 +42,23 @@ impl Machine {
         }
     }
 
+    pub fn other_consume(&self, event: Value) -> HashMap<String, Value> {
+        let mut data = self.data.lock().unwrap();
+        for (key, value) in data.iter_mut() {
+            if let Some((_initial_value, reducer)) = self.reducers.get(key) {
+                let updated_value = reducer(value.clone(), &mut event.clone());
+                if *value != updated_value {
+                    *value = updated_value.clone();
+                    for listener in self.listeners.lock().unwrap().iter() {
+                        listener(key, &updated_value, &event);
+                    }
+                }
+            }
+        }
+
+        data.clone()
+    }
+
     pub fn consume(&self, event: String, payload: Option<String>) -> String {
         let mut data = self.data.lock().unwrap();
         let payload_str = payload.as_deref().unwrap_or("{}");
