@@ -9,7 +9,7 @@ mod file;
 mod hermenia;
 mod jules;
 
-use hermenia::Machine;
+use hermenia::{Machine, hydrate_event};
 use jules::{download_model, invoke_llama_cli, model_exists};
 
 use std::collections::HashMap;
@@ -98,6 +98,7 @@ async fn main() {
     for event in sorted_events {
         let event_type = event["type"].as_str().unwrap().to_string();
         let payload = event["payload"].to_string();
+        let hydrated_event = hermenia::hydrate_event(event_type.clone(), &payload);
         machine.consume(event_type, Some(payload)); // this is the issue -- this footprint is wrong
     }
 
