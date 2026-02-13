@@ -53,10 +53,10 @@ fn exchange_reducer(state: Value, event: &mut Value) -> Value {
                     .unwrap()
                     .insert("conversation".to_string(), json!(conversation));
             }
-            new_state
-                .as_object_mut()
-                .unwrap()
-                .insert(event["id"].as_str().unwrap().to_string(), event["payload"].clone());
+            new_state.as_object_mut().unwrap().insert(
+                event["id"].as_str().unwrap().to_string(),
+                event["payload"].clone(),
+            );
             return new_state;
         }
         _ => {
@@ -72,16 +72,19 @@ async fn main() {
 
     if !model_exists("models") {
         if let Err(e) = download_model("models", "https://huggingface.co/Qwen/Qwen2-1.5B-Instruct-GGUF/resolve/main/qwen2-1_5b-instruct-q4_0.gguf?download=true").await {
-      eprintln!("Error downloading model: {}", e);
-      std::process::exit(1);
-    }
+            eprintln!("Error downloading model: {}", e);
+            std::process::exit(1);
+        }
     }
 
     let data: HashMap<String, Value> = HashMap::from([("exchanges".to_string(), json!({}))]);
     let mut listeners: Vec<Box<dyn Fn(&str, &Value, &Value) + Send + Sync>> = Vec::new();
     let reducers: HashMap<String, (Value, fn(Value, &mut Value) -> Value)> = HashMap::from([(
         "exchanges".to_string(),
-        (json!({}), exchange_reducer as fn(Value, &mut Value) -> Value),
+        (
+            json!({}),
+            exchange_reducer as fn(Value, &mut Value) -> Value,
+        ),
     )]);
 
     let machine = Machine::new(data, reducers, Mutex::new(std::mem::take(&mut listeners)));
@@ -95,7 +98,7 @@ async fn main() {
     for event in sorted_events {
         let event_type = event["type"].as_str().unwrap().to_string();
         let payload = event["payload"].to_string();
-        machine.consume(event_type, Some(payload));
+        machine.consume(event_type, Some(payload)); // this is the issue -- this footprint is wrong
     }
 
     machine.subscribe(Box::new(persist_events));
@@ -122,7 +125,8 @@ async fn main() {
 
         let exchanges_map: HashMap<String, Value> = serde_json::from_str(&exchanges).unwrap();
         let exchanges_values: &Value = exchanges_map.get("exchanges").unwrap();
-        let exchanges_values_map: HashMap<String, Value> = serde_json::from_str(&exchanges_values.to_string()).unwrap();
+        let exchanges_values_map: HashMap<String, Value> =
+            serde_json::from_str(&exchanges_values.to_string()).unwrap();
 
         let mut exchanges_iter = exchanges_values_map.iter();
 
@@ -178,9 +182,15 @@ async fn main() {
         };
 
         let full_prompt = if full_convo.is_empty() {
-            format!("<|im_start|>user\n{}<|im_end|>\n<|im_start|>assistant\n", new_prompt)
+            format!(
+                "<|im_start|>user\n{}<|im_end|>\n<|im_start|>assistant\n",
+                new_prompt
+            )
         } else {
-            format!("{}<|im_start|>user\n{}<|im_end|>\n<|im_start|>assistant\n", full_convo, new_prompt)
+            format!(
+                "{}<|im_start|>user\n{}<|im_end|>\n<|im_start|>assistant\n",
+                full_convo, new_prompt
+            )
         };
 
         // pass arg as query to invoke_llama_cli
