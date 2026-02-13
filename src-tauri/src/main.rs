@@ -99,7 +99,8 @@ async fn main() {
         let event_type = event["type"].as_str().unwrap().to_string();
         let payload = event["payload"].to_string();
         let hydrated_event = hermenia::hydrate_event(event_type.clone(), &payload);
-        machine.consume(event_type, Some(payload)); // this is the issue -- this footprint is wrong
+        machine.other_consume(event.clone());
+        // machine.consume(event_type, Some(payload)); // this is the issue -- this footprint is wrong
     }
 
     machine.subscribe(Box::new(persist_events));
