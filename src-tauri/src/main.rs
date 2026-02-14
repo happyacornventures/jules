@@ -9,7 +9,7 @@ mod file;
 mod hermenia;
 mod jules;
 
-use hermenia::{Machine, hydrate_event};
+use hermenia::Machine;
 use jules::{download_model, invoke_llama_cli, model_exists};
 
 use std::collections::HashMap;
@@ -66,6 +66,23 @@ fn exchange_reducer(state: Value, event: &mut Value) -> Value {
     state
 }
 
+fn hydrate_event(event: &Value) -> Value {
+    let id = Uuid::new_v4().to_string();
+
+    let timestamp = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .expect("Time went backwards")
+        .as_millis() as u64;
+
+    let mut new_event = event.as_object().cloned().unwrap_or_default();
+    new_event.insert("id".to_string(), json!(id));
+    new_event.insert("createTime".to_string(), json!(timestamp));
+
+    // println!("hydrated event {:?}", json!(new_event));
+
+    json!(new_event)
+}
+
 #[tokio::main]
 async fn main() {
     let args: Vec<String> = std::env::args().collect();
@@ -104,6 +121,7 @@ async fn main() {
     }
 
     machine.subscribe(Box::new(persist_events));
+    machine.interpret(Box::new(hydrate_event));
 
     if args.len() > 1 {
         // Check if --stream flag is present
