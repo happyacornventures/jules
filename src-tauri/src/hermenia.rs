@@ -11,7 +11,7 @@ pub struct Machine {
     pub interpreters: Mutex<Vec<Box<dyn Fn(&Value) -> Value + Send + Sync>>>,
 }
 
-pub fn hydrate_event(event: String, payload: &str) -> Value {
+fn hydrate_event(event: String, payload: &str) -> Value {
     let id = Uuid::new_v4().to_string();
     let payload_value: Value = serde_json::from_str(payload).unwrap();
 
