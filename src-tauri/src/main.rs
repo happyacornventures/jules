@@ -139,9 +139,9 @@ async fn main() {
             .and_then(|i| args[i].strip_prefix("--conversation="))
             .map(|s| s.to_string());
 
-        let other_exchanges = machine.other_consume(json!({"type": "exchanges_requested", "payload": {}}));
+        let exchanges = machine.other_consume(json!({"type": "exchanges_requested", "payload": {}}));
 
-        let exchanges_values: &Value = other_exchanges.get("exchanges").unwrap();
+        let exchanges_values: &Value = exchanges.get("exchanges").unwrap();
         let exchanges_values_map: HashMap<String, Value> =
             serde_json::from_str(&exchanges_values.to_string()).unwrap();
 
