@@ -179,11 +179,6 @@ async fn main() {
             });
         }
 
-        // alternate between user and assistant tags for each line in context
-        // let conversation: String = context_content.split("\n")
-        //   .filter(|line| !line.trim().is_empty())
-        //   .collect::<Vec<&str>>().into_iter().map(|line| format!("<|im_start|>user\n{}<|im_end|>", line)).collect::<String>();
-
         // Find the prompt (first non-flag argument)
         let prompt = args
             .iter()
