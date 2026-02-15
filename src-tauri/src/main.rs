@@ -116,7 +116,6 @@ async fn main() {
         let event_type = event["type"].as_str().unwrap().to_string();
         let payload = event["payload"].to_string();
         machine.other_consume(event.clone());
-        // machine.consume(event_type, Some(payload)); // this is the issue -- this footprint is wrong
     }
 
     machine.subscribe(Box::new(persist_events));
@@ -230,10 +229,7 @@ async fn main() {
                     buffer.clear();
                 }
 
-                machine.consume(
-                    "exchange_created".to_string(),
-                    Some(json!({"prompt": new_prompt, "response": aggregated_output, "conversation": convo_id}).to_string()),
-                );
+                machine.other_consume(json!({"type": "exchange_created", "payload": {"prompt": new_prompt, "response": aggregated_output, "conversation": convo_id}}));
             }
             Ok(None) => println!("No output from process."),
             Err(e) => eprintln!("Error executing external process: {}", e),
