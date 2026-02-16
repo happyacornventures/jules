@@ -83,6 +83,15 @@ fn hydrate_event(event: &Value) -> Value {
     json!(new_event)
 }
 
+fn conversation_interpreter(event: &Value) -> Value {
+    if event["payload"].as_object().and_then(|p| p.get("conversation")).map_or(true, |v| v.is_null()){
+        let mut new_event = event.as_object().cloned().unwrap_or_default();
+        new_event.insert("conversation".to_string(), json!(Uuid::new_v4().to_string()));
+        return json!(new_event);
+    }
+    event
+}
+
 #[tokio::main]
 async fn main() {
     let args: Vec<String> = std::env::args().collect();
