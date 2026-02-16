@@ -36,7 +36,7 @@ fn persist_events(key: &str, value: &Value, event: &Value) {
     write_file("exchanges.json", &json!(events)).expect("Failed to write to events file");
 }
 
-fn exchange_reducer(state: Value, event: &mut Value) -> Value {
+fn exchange_reducer(state: Value, event: Value) -> Value {
     let mut new_state = state.clone();
 
     match event["type"].as_str().unwrap() {
@@ -95,11 +95,11 @@ async fn main() {
 
     let data: HashMap<String, Value> = HashMap::from([("exchanges".to_string(), json!({}))]);
     let mut listeners: Vec<Box<dyn Fn(&str, &Value, &Value) + Send + Sync>> = Vec::new();
-    let reducers: HashMap<String, (Value, fn(Value, &mut Value) -> Value)> = HashMap::from([(
+    let reducers: HashMap<String, (Value, fn(Value, Value) -> Value)> = HashMap::from([(
         "exchanges".to_string(),
         (
             json!({}),
-            exchange_reducer as fn(Value, &mut Value) -> Value,
+            exchange_reducer as fn(Value, Value) -> Value,
         ),
     )]);
 

@@ -6,7 +6,7 @@ use uuid::Uuid;
 
 pub struct Machine {
     pub data: Mutex<HashMap<String, Value>>,
-    pub reducers: HashMap<String, (Value, fn(Value, &mut Value) -> Value)>,
+    pub reducers: HashMap<String, (Value, fn(Value, Value) -> Value)>,
     pub listeners: Mutex<Vec<Box<dyn Fn(&str, &Value, &Value) + Send + Sync>>>,
     pub interpreters: Mutex<Vec<Box<dyn Fn(&Value) -> Value + Send + Sync>>>,
 }
@@ -31,7 +31,7 @@ fn hydrate_event(event: String, payload: &str) -> Value {
 impl Machine {
     pub fn new(
         data: HashMap<String, Value>,
-        reducers: HashMap<String, (Value, fn(Value, &mut Value) -> Value)>,
+        reducers: HashMap<String, (Value, fn(Value, Value) -> Value)>,
         listeners: Mutex<Vec<Box<dyn Fn(&str, &Value, &Value) + Send + Sync>>>,
     ) -> Self {
         Self {
@@ -56,7 +56,7 @@ impl Machine {
         for (key, value) in data.iter_mut() {
             if let Some((_initial_value, reducer)) = self.reducers.get(key) {
                 // println!("reducer getting event {:?} for key {}", wrapped_event, key);
-                let updated_value = reducer(value.clone(), &mut wrapped_event);
+                let updated_value = reducer(value.clone(), wrapped_event.clone());
                 if *value != updated_value {
                     *value = updated_value.clone();
                     for listener in self.listeners.lock().unwrap().iter() {
@@ -77,7 +77,7 @@ impl Machine {
 
         for (key, value) in data.iter_mut() {
             if let Some((_initial_value, reducer)) = self.reducers.get(key) {
-                let updated_value = reducer(value.clone(), &mut hydrated_event);
+                let updated_value = reducer(value.clone(), hydrated_event.clone());
                 if *value != updated_value {
                     *value = updated_value.clone();
                     for listener in self.listeners.lock().unwrap().iter() {
