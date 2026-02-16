@@ -89,7 +89,7 @@ fn conversation_interpreter(event: &Value) -> Value {
         new_event.insert("conversation".to_string(), json!(Uuid::new_v4().to_string()));
         return json!(new_event);
     }
-    event
+    event.clone()
 }
 
 #[tokio::main]
