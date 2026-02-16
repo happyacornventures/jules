@@ -41,18 +41,6 @@ fn exchange_reducer(state: Value, event: &mut Value) -> Value {
 
     match event["type"].as_str().unwrap() {
         "exchange_created" => {
-            let payload = &mut event["payload"];
-            if payload
-                .as_object()
-                .and_then(|p| p.get("conversation"))
-                .map_or(true, |v| v.is_null())
-            {
-                let conversation = Uuid::new_v4().to_string();
-                payload
-                    .as_object_mut()
-                    .unwrap()
-                    .insert("conversation".to_string(), json!(conversation));
-            }
             new_state.as_object_mut().unwrap().insert(
                 event["id"].as_str().unwrap().to_string(),
                 event["payload"].clone(),
