@@ -75,11 +75,11 @@ fn conversation_interpreter(event: &Value) -> Value {
     if event["payload"].as_object().and_then(|p| p.get("conversation")).map_or(true, |v| v.is_null()){
         let mut new_event = event.clone();
         if let Some(payload) = new_event.get_mut("payload").and_then(|p| p.as_object_mut()) {
-            let timestamp = SystemTime::now()
-                .duration_since(UNIX_EPOCH)
-                .expect("Time went backwards")
-                .as_millis() as u64;
-            payload.insert("createTime".to_string(), json!(timestamp));
+            // let timestamp = SystemTime::now()
+            //     .duration_since(UNIX_EPOCH)
+            //     .expect("Time went backwards")
+            //     .as_millis() as u64;
+            // payload.insert("createTime".to_string(), json!(timestamp));
             payload.insert("conversation".to_string(), json!(Uuid::new_v4().to_string()));
         }
         return json!(new_event);
