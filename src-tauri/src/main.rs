@@ -175,8 +175,8 @@ async fn main() {
             }
         }
 
-        let full_convo: String = relevant_exchanges
-            .iter()
+        relevant_exchanges.sort_by_key(|e| e["createTime"].as_u64());
+        let full_convo: String = relevant_exchanges.iter()
             .map(|exchange| {
                 let prompt = exchange["prompt"].as_str().unwrap_or("");
                 let response = exchange["response"].as_str().unwrap_or("").trim();
