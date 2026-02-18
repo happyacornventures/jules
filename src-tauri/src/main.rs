@@ -136,6 +136,7 @@ async fn main() {
 
     machine.subscribe(Box::new(persist_events));
     machine.interpret(Box::new(hydrate_event));
+    machine.interpret(Box::new(timestamp_interpreter));
     machine.interpret(Box::new(conversation_interpreter));
 
     if args.len() > 1 {
