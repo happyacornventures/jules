@@ -87,6 +87,18 @@ fn conversation_interpreter(event: &Value) -> Value {
     event.clone()
 }
 
+fn timestamp_interpreter(event: &Value) -> Value {
+    let mut new_event = event.clone();
+    if let Some(payload) = new_event.get_mut("payload").and_then(|p| p.as_object_mut()) {
+        let timestamp = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .expect("Time went backwards")
+            .as_millis() as u64;
+        payload.insert("createTime".to_string(), json!(timestamp));
+    }
+    json!(new_event)
+}
+
 #[tokio::main]
 async fn main() {
     let args: Vec<String> = std::env::args().collect();
