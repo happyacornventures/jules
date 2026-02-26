@@ -42,7 +42,7 @@ impl Machine {
         }
     }
 
-    pub fn other_consume(&self, event: Value) -> HashMap<String, Value> {
+    pub fn consume(&self, event: Value) -> HashMap<String, Value> {
         let mut data = self.data.lock().unwrap();
         let mut wrapped_event = event.clone();
         for interpreter in self.interpreters.lock().unwrap().iter() {
@@ -68,26 +68,6 @@ impl Machine {
         }
 
         data.clone()
-    }
-
-    pub fn consume(&self, event: String, payload: Option<String>) -> String {
-        let mut data = self.data.lock().unwrap();
-        let payload_str = payload.as_deref().unwrap_or("{}");
-        let hydrated_event = hydrate_event(event.to_string(), payload_str);
-
-        for (key, value) in data.iter_mut() {
-            if let Some((_initial_value, reducer)) = self.reducers.get(key) {
-                let updated_value = reducer(value.clone(), hydrated_event.clone());
-                if *value != updated_value {
-                    *value = updated_value.clone();
-                    for listener in self.listeners.lock().unwrap().iter() {
-                        listener(key, &updated_value, &hydrated_event);
-                    }
-                }
-            }
-        }
-
-        serde_json::to_string(&*data).unwrap()
     }
 
     pub fn subscribe(&self, callback: Box<dyn Fn(&str, &Value, &Value) + Send + Sync>) {
