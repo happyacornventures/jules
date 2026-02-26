@@ -126,7 +126,7 @@ async fn main() {
     for event in sorted_events {
         let event_type = event["type"].as_str().unwrap().to_string();
         let payload = event["payload"].to_string();
-        machine.other_consume(event.clone());
+        machine.consume(event.clone());
     }
 
     machine.subscribe(Box::new(persist_events));
@@ -152,7 +152,7 @@ async fn main() {
             .and_then(|i| args[i].strip_prefix("--conversation="))
             .map(|s| s.to_string());
 
-        let exchanges = machine.other_consume(json!({"type": "exchanges_requested", "payload": {}}));
+        let exchanges = machine.consume(json!({"type": "exchanges_requested", "payload": {}}));
 
         let exchanges_values: &Value = exchanges.get("exchanges").unwrap();
         let exchanges_values_map: HashMap<String, Value> =
@@ -235,7 +235,7 @@ async fn main() {
                     buffer.clear();
                 }
 
-                machine.other_consume(json!({"type": "exchange_created", "payload": {"prompt": new_prompt, "response": aggregated_output, "conversation": convo_id}}));
+                machine.consume(json!({"type": "exchange_created", "payload": {"prompt": new_prompt, "response": aggregated_output, "conversation": convo_id}}));
             }
             Ok(None) => println!("No output from process."),
             Err(e) => eprintln!("Error executing external process: {}", e),
