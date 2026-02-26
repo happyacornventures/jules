@@ -47,20 +47,14 @@ impl Machine {
         let mut wrapped_event = event.clone();
         for interpreter in self.interpreters.lock().unwrap().iter() {
             wrapped_event = interpreter(&wrapped_event.clone());
-            // if interpreted_event != event {
-            //     return self.other_consume(interpreted_event);
-            // }
         }
 
-        // println!("wrapped event {:?}", wrapped_event);
         for (key, value) in data.iter_mut() {
             if let Some((_initial_value, reducer)) = self.reducers.get(key) {
-                // println!("reducer getting event {:?} for key {}", wrapped_event, key);
                 let updated_value = reducer(value.clone(), wrapped_event.clone());
                 if *value != updated_value {
                     *value = updated_value.clone();
                     for listener in self.listeners.lock().unwrap().iter() {
-                        // println!("listener getting event {:?} for key {}", wrapped_event, key);
                         listener(key, &updated_value, &wrapped_event);
                     }
                 }
