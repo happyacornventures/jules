@@ -11,23 +11,6 @@ pub struct Machine {
     pub interpreters: Mutex<Vec<Box<dyn Fn(&Value) -> Value + Send + Sync>>>,
 }
 
-fn hydrate_event(event: String, payload: &str) -> Value {
-    let id = Uuid::new_v4().to_string();
-    let payload_value: Value = serde_json::from_str(payload).unwrap();
-
-    let timestamp = SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .expect("Time went backwards")
-        .as_millis() as u64;
-
-    json!({
-        "id": id,
-        "createTime": timestamp,
-        "type": event,
-        "payload": payload_value
-    })
-}
-
 impl Machine {
     pub fn new(
         data: HashMap<String, Value>,
