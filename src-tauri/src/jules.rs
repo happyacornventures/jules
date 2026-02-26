@@ -5,8 +5,6 @@ use std::fs;
 use std::io::{BufRead, BufReader, Cursor, Read, Write};
 use std::process::{Command, Stdio};
 
-// use crate::file::{read_file, write_file};
-
 pub fn model_exists(model_path: &str) -> bool {
     std::path::Path::new(&format!("{}/model.gguf", model_path)).exists()
 }
