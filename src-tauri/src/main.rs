@@ -5,14 +5,14 @@ use std::io::Error;
 use std::io::Read;
 use uuid::Uuid;
 
+mod cli;
 mod file;
 mod hermenia;
 mod jules;
-mod cli;
 
+use cli::run as run_cli;
 use hermenia::Machine;
 use jules::{download_model, invoke_llama_cli, model_exists};
-use cli::run as run_cli;
 
 use std::collections::HashMap;
 use std::fs::{self, create_dir_all, File};
@@ -74,10 +74,17 @@ fn hydrate_event(event: &Value) -> Value {
 }
 
 fn conversation_interpreter(event: &Value) -> Value {
-    if event["payload"].as_object().and_then(|p| p.get("conversation")).map_or(true, |v| v.is_null()){
+    if event["payload"]
+        .as_object()
+        .and_then(|p| p.get("conversation"))
+        .map_or(true, |v| v.is_null())
+    {
         let mut new_event = event.clone();
         if let Some(payload) = new_event.get_mut("payload").and_then(|p| p.as_object_mut()) {
-            payload.insert("conversation".to_string(), json!(Uuid::new_v4().to_string()));
+            payload.insert(
+                "conversation".to_string(),
+                json!(Uuid::new_v4().to_string()),
+            );
         }
         return json!(new_event);
     }

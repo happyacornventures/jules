@@ -65,10 +65,17 @@ fn hydrate_event(event: &Value) -> Value {
 }
 
 fn conversation_interpreter(event: &Value) -> Value {
-    if event["payload"].as_object().and_then(|p| p.get("conversation")).map_or(true, |v| v.is_null()){
+    if event["payload"]
+        .as_object()
+        .and_then(|p| p.get("conversation"))
+        .map_or(true, |v| v.is_null())
+    {
         let mut new_event = event.clone();
         if let Some(payload) = new_event.get_mut("payload").and_then(|p| p.as_object_mut()) {
-            payload.insert("conversation".to_string(), json!(Uuid::new_v4().to_string()));
+            payload.insert(
+                "conversation".to_string(),
+                json!(Uuid::new_v4().to_string()),
+            );
         }
         return json!(new_event);
     }
@@ -88,145 +95,143 @@ fn timestamp_interpreter(event: &Value) -> Value {
 }
 
 pub async fn run(args: Vec<String>) {
-        // Check if --stream flag is present
-        let stream = args.contains(&"--stream".to_string());
+    // Check if --stream flag is present
+    let stream = args.contains(&"--stream".to_string());
 
-        // Check if --context flag is present and capture its value
-        let context = args
-            .iter()
-            .position(|arg| arg.starts_with("--context="))
-            .and_then(|i| args[i].strip_prefix("--context="))
-            .map(|s| s.to_string());
+    // Check if --context flag is present and capture its value
+    let context = args
+        .iter()
+        .position(|arg| arg.starts_with("--context="))
+        .and_then(|i| args[i].strip_prefix("--context="))
+        .map(|s| s.to_string());
 
-        // Check if --context flag is present and capture its value
-        let convo_id = args
-            .iter()
-            .position(|arg| arg.starts_with("--conversation="))
-            .and_then(|i| args[i].strip_prefix("--conversation="))
-            .map(|s| s.to_string());
+    // Check if --context flag is present and capture its value
+    let convo_id = args
+        .iter()
+        .position(|arg| arg.starts_with("--conversation="))
+        .and_then(|i| args[i].strip_prefix("--conversation="))
+        .map(|s| s.to_string());
 
-        if !model_exists("models") {
-            if let Err(e) = download_model("models", "https://huggingface.co/Qwen/Qwen2-1.5B-Instruct-GGUF/resolve/main/qwen2-1_5b-instruct-q4_0.gguf?download=true").await {
+    if !model_exists("models") {
+        if let Err(e) = download_model("models", "https://huggingface.co/Qwen/Qwen2-1.5B-Instruct-GGUF/resolve/main/qwen2-1_5b-instruct-q4_0.gguf?download=true").await {
                 eprintln!("Error downloading model: {}", e);
                 std::process::exit(1);
             }
-        }
+    }
 
-        let data: HashMap<String, Value> = HashMap::from([("exchanges".to_string(), json!({}))]);
-        let mut listeners: Vec<Box<dyn Fn(&str, &Value, &Value) + Send + Sync>> = Vec::new();
-        let reducers: HashMap<String, (Value, fn(Value, Value) -> Value)> = HashMap::from([(
-            "exchanges".to_string(),
-            (
-                json!({}),
-                exchange_reducer as fn(Value, Value) -> Value,
-            ),
-        )]);
+    let data: HashMap<String, Value> = HashMap::from([("exchanges".to_string(), json!({}))]);
+    let mut listeners: Vec<Box<dyn Fn(&str, &Value, &Value) + Send + Sync>> = Vec::new();
+    let reducers: HashMap<String, (Value, fn(Value, Value) -> Value)> = HashMap::from([(
+        "exchanges".to_string(),
+        (json!({}), exchange_reducer as fn(Value, Value) -> Value),
+    )]);
 
-        let machine = Machine::new(data, reducers, Mutex::new(std::mem::take(&mut listeners)));
+    let machine = Machine::new(data, reducers, Mutex::new(std::mem::take(&mut listeners)));
 
-        let events_str = read_file("exchanges.json", json!({})).unwrap();
+    let events_str = read_file("exchanges.json", json!({})).unwrap();
 
-        let events: HashMap<String, Value> = serde_json::from_str(&events_str).unwrap();
-        let mut sorted_events: Vec<_> = events.values().collect();
-        sorted_events.sort_by_key(|e| e["createTime"].as_u64());
+    let events: HashMap<String, Value> = serde_json::from_str(&events_str).unwrap();
+    let mut sorted_events: Vec<_> = events.values().collect();
+    sorted_events.sort_by_key(|e| e["createTime"].as_u64());
 
-        for event in sorted_events {
-            let event_type = event["type"].as_str().unwrap().to_string();
-            let payload = event["payload"].to_string();
-            machine.consume(event.clone());
-        }
+    for event in sorted_events {
+        let event_type = event["type"].as_str().unwrap().to_string();
+        let payload = event["payload"].to_string();
+        machine.consume(event.clone());
+    }
 
-        machine.subscribe(Box::new(persist_events));
-        machine.interpret(Box::new(hydrate_event));
-        machine.interpret(Box::new(timestamp_interpreter));
-        machine.interpret(Box::new(conversation_interpreter));
+    machine.subscribe(Box::new(persist_events));
+    machine.interpret(Box::new(hydrate_event));
+    machine.interpret(Box::new(timestamp_interpreter));
+    machine.interpret(Box::new(conversation_interpreter));
 
-        let exchanges = machine.consume(json!({"type": "exchanges_requested", "payload": {}}));
+    let exchanges = machine.consume(json!({"type": "exchanges_requested", "payload": {}}));
 
-        let exchanges_values: &Value = exchanges.get("exchanges").unwrap();
-        let exchanges_values_map: HashMap<String, Value> =
-            serde_json::from_str(&exchanges_values.to_string()).unwrap();
+    let exchanges_values: &Value = exchanges.get("exchanges").unwrap();
+    let exchanges_values_map: HashMap<String, Value> =
+        serde_json::from_str(&exchanges_values.to_string()).unwrap();
 
-        let mut exchanges_iter = exchanges_values_map.iter();
+    let mut exchanges_iter = exchanges_values_map.iter();
 
-        let mut relevant_exchanges: Vec<Value> = Vec::new();
+    let mut relevant_exchanges: Vec<Value> = Vec::new();
 
-        if let Some(ref convo_id) = convo_id {
-            for (_, exchange) in exchanges_iter {
-                if exchange["conversation"].as_str().unwrap() == convo_id {
-                    relevant_exchanges.push(exchange.clone());
-                }
+    if let Some(ref convo_id) = convo_id {
+        for (_, exchange) in exchanges_iter {
+            if exchange["conversation"].as_str().unwrap() == convo_id {
+                relevant_exchanges.push(exchange.clone());
             }
         }
+    }
 
-        relevant_exchanges.sort_by_key(|e| e["createTime"].as_u64());
-        let full_convo: String = relevant_exchanges.iter()
-            .map(|exchange| {
-                let prompt = exchange["prompt"].as_str().unwrap_or("");
-                let response = exchange["response"].as_str().unwrap_or("").trim();
-                format!(
-                    "<|im_start|>user\n{}<|im_end|>\n<|im_start|>assistant\n{}<|im_end|>",
-                    prompt, response
-                )
-            })
-            .collect::<Vec<String>>()
-            .join("\n");
-
-        let mut context_content: String = String::new();
-
-        if let Some(ctx) = &context {
-            context_content = read_file(ctx, json!({})).unwrap_or_else(|e| {
-                eprintln!("Error reading context file: {}", e);
-                String::new()
-            });
-        }
-
-        // Find the prompt (first non-flag argument)
-        let prompt = args
-            .iter()
-            .skip(1)
-            .find(|arg| !arg.starts_with("--"))
-            .map(|s| s.as_str())
-            .unwrap_or("");
-
-        let new_prompt = if context_content.is_empty() {
-            format!("{}", prompt.to_string())
-        } else {
-            format!("{}\n\n{}", context_content, prompt)
-        };
-
-        let full_prompt = if full_convo.is_empty() {
+    relevant_exchanges.sort_by_key(|e| e["createTime"].as_u64());
+    let full_convo: String = relevant_exchanges
+        .iter()
+        .map(|exchange| {
+            let prompt = exchange["prompt"].as_str().unwrap_or("");
+            let response = exchange["response"].as_str().unwrap_or("").trim();
             format!(
-                "<|im_start|>user\n{}<|im_end|>\n<|im_start|>assistant\n",
-                new_prompt
+                "<|im_start|>user\n{}<|im_end|>\n<|im_start|>assistant\n{}<|im_end|>",
+                prompt, response
             )
-        } else {
-            format!(
-                "{}<|im_start|>user\n{}<|im_end|>\n<|im_start|>assistant\n",
-                full_convo, new_prompt
-            )
-        };
+        })
+        .collect::<Vec<String>>()
+        .join("\n");
 
-        // pass arg as query to invoke_llama_cli
-        match invoke_llama_cli(&full_prompt, stream).await {
-            Ok(Some(reader)) => {
-                let mut buf_reader = reader;
-                let mut aggregated_output = String::new();
-                let mut buffer = String::new();
-                use std::io::BufRead;
+    let mut context_content: String = String::new();
 
-                while buf_reader.read_line(&mut buffer).unwrap() > 0 {
-                    if !buffer.trim().starts_with("> EOF by user") && !buffer.trim().is_empty() {
-                        print!("{}", buffer);
-                        aggregated_output.push_str(&buffer);
-                        aggregated_output.push('\n');
-                    }
-                    buffer.clear();
+    if let Some(ctx) = &context {
+        context_content = read_file(ctx, json!({})).unwrap_or_else(|e| {
+            eprintln!("Error reading context file: {}", e);
+            String::new()
+        });
+    }
+
+    // Find the prompt (first non-flag argument)
+    let prompt = args
+        .iter()
+        .skip(1)
+        .find(|arg| !arg.starts_with("--"))
+        .map(|s| s.as_str())
+        .unwrap_or("");
+
+    let new_prompt = if context_content.is_empty() {
+        format!("{}", prompt.to_string())
+    } else {
+        format!("{}\n\n{}", context_content, prompt)
+    };
+
+    let full_prompt = if full_convo.is_empty() {
+        format!(
+            "<|im_start|>user\n{}<|im_end|>\n<|im_start|>assistant\n",
+            new_prompt
+        )
+    } else {
+        format!(
+            "{}<|im_start|>user\n{}<|im_end|>\n<|im_start|>assistant\n",
+            full_convo, new_prompt
+        )
+    };
+
+    // pass arg as query to invoke_llama_cli
+    match invoke_llama_cli(&full_prompt, stream).await {
+        Ok(Some(reader)) => {
+            let mut buf_reader = reader;
+            let mut aggregated_output = String::new();
+            let mut buffer = String::new();
+            use std::io::BufRead;
+
+            while buf_reader.read_line(&mut buffer).unwrap() > 0 {
+                if !buffer.trim().starts_with("> EOF by user") && !buffer.trim().is_empty() {
+                    print!("{}", buffer);
+                    aggregated_output.push_str(&buffer);
+                    aggregated_output.push('\n');
                 }
-
-                machine.consume(json!({"type": "exchange_created", "payload": {"prompt": new_prompt, "response": aggregated_output, "conversation": convo_id}}));
+                buffer.clear();
             }
-            Ok(None) => println!("No output from process."),
-            Err(e) => eprintln!("Error executing external process: {}", e),
+
+            machine.consume(json!({"type": "exchange_created", "payload": {"prompt": new_prompt, "response": aggregated_output, "conversation": convo_id}}));
         }
+        Ok(None) => println!("No output from process."),
+        Err(e) => eprintln!("Error executing external process: {}", e),
+    }
 }
