@@ -98,42 +98,6 @@ fn timestamp_interpreter(event: &Value) -> Value {
 async fn main() {
     let args: Vec<String> = std::env::args().collect();
 
-    if !model_exists("models") {
-        if let Err(e) = download_model("models", "https://huggingface.co/Qwen/Qwen2-1.5B-Instruct-GGUF/resolve/main/qwen2-1_5b-instruct-q4_0.gguf?download=true").await {
-            eprintln!("Error downloading model: {}", e);
-            std::process::exit(1);
-        }
-    }
-
-    let data: HashMap<String, Value> = HashMap::from([("exchanges".to_string(), json!({}))]);
-    let mut listeners: Vec<Box<dyn Fn(&str, &Value, &Value) + Send + Sync>> = Vec::new();
-    let reducers: HashMap<String, (Value, fn(Value, Value) -> Value)> = HashMap::from([(
-        "exchanges".to_string(),
-        (
-            json!({}),
-            exchange_reducer as fn(Value, Value) -> Value,
-        ),
-    )]);
-
-    let machine = Machine::new(data, reducers, Mutex::new(std::mem::take(&mut listeners)));
-
-    let events_str = read_file("exchanges.json", json!({})).unwrap();
-
-    let events: HashMap<String, Value> = serde_json::from_str(&events_str).unwrap();
-    let mut sorted_events: Vec<_> = events.values().collect();
-    sorted_events.sort_by_key(|e| e["createTime"].as_u64());
-
-    for event in sorted_events {
-        let event_type = event["type"].as_str().unwrap().to_string();
-        let payload = event["payload"].to_string();
-        machine.consume(event.clone());
-    }
-
-    machine.subscribe(Box::new(persist_events));
-    machine.interpret(Box::new(hydrate_event));
-    machine.interpret(Box::new(timestamp_interpreter));
-    machine.interpret(Box::new(conversation_interpreter));
-
     if args.len() > 1 {
         // Check if --stream flag is present
         let stream = args.contains(&"--stream".to_string());
@@ -151,6 +115,42 @@ async fn main() {
             .position(|arg| arg.starts_with("--conversation="))
             .and_then(|i| args[i].strip_prefix("--conversation="))
             .map(|s| s.to_string());
+
+        if !model_exists("models") {
+            if let Err(e) = download_model("models", "https://huggingface.co/Qwen/Qwen2-1.5B-Instruct-GGUF/resolve/main/qwen2-1_5b-instruct-q4_0.gguf?download=true").await {
+                eprintln!("Error downloading model: {}", e);
+                std::process::exit(1);
+            }
+        }
+
+        let data: HashMap<String, Value> = HashMap::from([("exchanges".to_string(), json!({}))]);
+        let mut listeners: Vec<Box<dyn Fn(&str, &Value, &Value) + Send + Sync>> = Vec::new();
+        let reducers: HashMap<String, (Value, fn(Value, Value) -> Value)> = HashMap::from([(
+            "exchanges".to_string(),
+            (
+                json!({}),
+                exchange_reducer as fn(Value, Value) -> Value,
+            ),
+        )]);
+
+        let machine = Machine::new(data, reducers, Mutex::new(std::mem::take(&mut listeners)));
+
+        let events_str = read_file("exchanges.json", json!({})).unwrap();
+
+        let events: HashMap<String, Value> = serde_json::from_str(&events_str).unwrap();
+        let mut sorted_events: Vec<_> = events.values().collect();
+        sorted_events.sort_by_key(|e| e["createTime"].as_u64());
+
+        for event in sorted_events {
+            let event_type = event["type"].as_str().unwrap().to_string();
+            let payload = event["payload"].to_string();
+            machine.consume(event.clone());
+        }
+
+        machine.subscribe(Box::new(persist_events));
+        machine.interpret(Box::new(hydrate_event));
+        machine.interpret(Box::new(timestamp_interpreter));
+        machine.interpret(Box::new(conversation_interpreter));
 
         let exchanges = machine.consume(json!({"type": "exchanges_requested", "payload": {}}));
 
