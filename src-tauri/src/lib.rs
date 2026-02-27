@@ -1,5 +1,7 @@
 mod file;
 mod jules;
+mod hermenia;
+mod cli;
 
 use jules::{download_model, invoke_llama_cli, model_exists};
 
