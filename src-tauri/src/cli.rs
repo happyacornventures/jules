@@ -90,6 +90,10 @@ fn timestamp_interpreter(event: &Value) -> Value {
     json!(new_event)
 }
 
+struct Rumi {
+    machine: Machine,
+}
+
 pub async fn run(args: Vec<String>) {
     // Check if --stream flag is present
     let stream = args.contains(&"--stream".to_string());
