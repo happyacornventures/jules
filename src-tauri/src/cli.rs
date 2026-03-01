@@ -94,6 +94,21 @@ struct Rumi {
     machine: Machine,
 }
 
+impl Rumi {
+    fn new() -> Self {
+        let data: HashMap<String, Value> = HashMap::from([("exchanges".to_string(), json!({}))]);
+        let listeners: Vec<Box<dyn Fn(&str, &Value, &Value) + Send + Sync>> = Vec::new();
+        let reducers: HashMap<String, (Value, fn(Value, Value) -> Value)> = HashMap::from([(
+            "exchanges".to_string(),
+            (json!({}), exchange_reducer as fn(Value, Value) -> Value),
+        )]);
+
+        Rumi {
+            machine: Machine::new(data, reducers, Mutex::new(listeners)),
+        }
+    }
+}
+
 pub async fn run(args: Vec<String>) {
     // Check if --stream flag is present
     let stream = args.contains(&"--stream".to_string());
