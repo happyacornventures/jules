@@ -108,7 +108,13 @@ impl Rumi {
         }
     }
 
-    async fn chat(&mut self, full_prompt: String, stream: bool, convo_id: Option<String>) {
+    async fn chat(
+        &mut self,
+        full_prompt: String,
+        new_prompt: String,
+        stream: bool,
+        convo_id: Option<String>,
+    ) {
         // pass arg as query to invoke_llama_cli
         match invoke_llama_cli(&full_prompt, stream).await {
             Ok(Some(reader)) => {
@@ -126,7 +132,7 @@ impl Rumi {
                     buffer.clear();
                 }
 
-                self.machine.consume(json!({"type": "exchange_created", "payload": {"prompt": full_prompt, "response": aggregated_output, "conversation": convo_id}}));
+                self.machine.consume(json!({"type": "exchange_created", "payload": {"prompt": new_prompt, "response": aggregated_output, "conversation": convo_id}}));
             }
             Ok(None) => println!("No output from process."),
             Err(e) => eprintln!("Error executing external process: {}", e),
