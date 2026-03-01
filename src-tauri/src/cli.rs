@@ -107,6 +107,31 @@ impl Rumi {
             machine: Machine::new(data, reducers, Mutex::new(listeners)),
         }
     }
+
+    async fn chat(&mut self, full_prompt: String, stream: bool, convo_id: Option<String>) {
+        // pass arg as query to invoke_llama_cli
+        match invoke_llama_cli(&full_prompt, stream).await {
+            Ok(Some(reader)) => {
+                let mut buf_reader = reader;
+                let mut aggregated_output = String::new();
+                let mut buffer = String::new();
+                use std::io::BufRead;
+
+                while buf_reader.read_line(&mut buffer).unwrap() > 0 {
+                    if !buffer.trim().starts_with("> EOF by user") && !buffer.trim().is_empty() {
+                        print!("{}", buffer);
+                        aggregated_output.push_str(&buffer);
+                        aggregated_output.push('\n');
+                    }
+                    buffer.clear();
+                }
+
+                self.machine.consume(json!({"type": "exchange_created", "payload": {"prompt": full_prompt, "response": aggregated_output, "conversation": convo_id}}));
+            }
+            Ok(None) => println!("No output from process."),
+            Err(e) => eprintln!("Error executing external process: {}", e),
+        }
+    }
 }
 
 pub async fn run(args: Vec<String>) {
