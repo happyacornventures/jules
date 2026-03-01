@@ -17,10 +17,6 @@ use tauri::Manager;
 
 use crate::file::{read_file, write_file};
 
-fn state_identity(state: Value, event: Value) -> Value {
-    state
-}
-
 fn persist_events(key: &str, value: &Value, event: &Value) {
     let existing_events_str = read_file("exchanges.json", json!({})).unwrap();
     let mut events: HashMap<String, Value> = serde_json::from_str(&existing_events_str).unwrap();
