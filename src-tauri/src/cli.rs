@@ -103,8 +103,10 @@ impl Rumi {
             (json!({}), exchange_reducer as fn(Value, Value) -> Value),
         )]);
 
+        let machine = Machine::new(data, reducers, Mutex::new(listeners));
+
         Rumi {
-            machine: Machine::new(data, reducers, Mutex::new(listeners)),
+            machine,
         }
     }
 
