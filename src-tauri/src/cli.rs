@@ -105,9 +105,24 @@ impl Rumi {
 
         let machine = Machine::new(data, reducers, Mutex::new(listeners));
 
-        Rumi {
-            machine,
+        let events_str = read_file("exchanges.json", json!({})).unwrap();
+
+        let events: HashMap<String, Value> = serde_json::from_str(&events_str).unwrap();
+        let mut sorted_events: Vec<_> = events.values().collect();
+        sorted_events.sort_by_key(|e| e["createTime"].as_u64());
+
+        for event in sorted_events {
+            let event_type = event["type"].as_str().unwrap().to_string();
+            let payload = event["payload"].to_string();
+            machine.consume(event.clone());
         }
+
+        machine.subscribe(Box::new(persist_events));
+        machine.interpret(Box::new(hydrate_event));
+        machine.interpret(Box::new(timestamp_interpreter));
+        machine.interpret(Box::new(conversation_interpreter));
+
+        Rumi { machine }
     }
 
     async fn chat(
