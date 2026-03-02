@@ -186,7 +186,7 @@ pub async fn run(args: Vec<String>) {
             }
     }
 
-    let rumi = Rumi::new();
+    let mut rumi = Rumi::new();
 
     let data: HashMap<String, Value> = HashMap::from([("exchanges".to_string(), json!({}))]);
     let mut listeners: Vec<Box<dyn Fn(&str, &Value, &Value) + Send + Sync>> = Vec::new();
