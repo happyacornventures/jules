@@ -187,35 +187,6 @@ pub async fn run(args: Vec<String>) {
     }
 
     let mut rumi = Rumi::new();
-
-    // let data: HashMap<String, Value> = HashMap::from([("exchanges".to_string(), json!({}))]);
-    // let mut listeners: Vec<Box<dyn Fn(&str, &Value, &Value) + Send + Sync>> = Vec::new();
-    // let reducers: HashMap<String, (Value, fn(Value, Value) -> Value)> = HashMap::from([(
-    //     "exchanges".to_string(),
-    //     (json!({}), exchange_reducer as fn(Value, Value) -> Value),
-    // )]);
-
-    // let machine = Machine::new(data, reducers, Mutex::new(std::mem::take(&mut listeners)));
-
-    // let events_str = read_file("exchanges.json", json!({})).unwrap();
-
-    // let events: HashMap<String, Value> = serde_json::from_str(&events_str).unwrap();
-    // let mut sorted_events: Vec<_> = events.values().collect();
-    // sorted_events.sort_by_key(|e| e["createTime"].as_u64());
-
-    // for event in sorted_events {
-    //     let event_type = event["type"].as_str().unwrap().to_string();
-    //     let payload = event["payload"].to_string();
-    //     machine.consume(event.clone());
-    // }
-
-    // machine.subscribe(Box::new(persist_events));
-    // machine.interpret(Box::new(hydrate_event));
-    // machine.interpret(Box::new(timestamp_interpreter));
-    // machine.interpret(Box::new(conversation_interpreter));
-
-    // let exchanges = machine.consume(json!({"type": "exchanges_requested", "payload": {}}));
-
     let exchanges = rumi.get_exchanges();
 
     let exchanges_values: &Value = exchanges.get("exchanges").unwrap();
@@ -284,27 +255,4 @@ pub async fn run(args: Vec<String>) {
     };
 
     rumi.chat(full_prompt, new_prompt, stream, convo_id).await;
-
-    // pass arg as query to invoke_llama_cli
-    // match invoke_llama_cli(&full_prompt, stream).await {
-    //     Ok(Some(reader)) => {
-    //         let mut buf_reader = reader;
-    //         let mut aggregated_output = String::new();
-    //         let mut buffer = String::new();
-    //         use std::io::BufRead;
-
-    //         while buf_reader.read_line(&mut buffer).unwrap() > 0 {
-    //             if !buffer.trim().starts_with("> EOF by user") && !buffer.trim().is_empty() {
-    //                 print!("{}", buffer);
-    //                 aggregated_output.push_str(&buffer);
-    //                 aggregated_output.push('\n');
-    //             }
-    //             buffer.clear();
-    //         }
-
-    //         machine.consume(json!({"type": "exchange_created", "payload": {"prompt": new_prompt, "response": aggregated_output, "conversation": convo_id}}));
-    //     }
-    //     Ok(None) => println!("No output from process."),
-    //     Err(e) => eprintln!("Error executing external process: {}", e),
-    // }
 }
