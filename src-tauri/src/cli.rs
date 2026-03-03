@@ -283,26 +283,28 @@ pub async fn run(args: Vec<String>) {
         )
     };
 
+    rumi.chat(full_prompt, new_prompt, stream, convo_id).await;
+
     // pass arg as query to invoke_llama_cli
-    match invoke_llama_cli(&full_prompt, stream).await {
-        Ok(Some(reader)) => {
-            let mut buf_reader = reader;
-            let mut aggregated_output = String::new();
-            let mut buffer = String::new();
-            use std::io::BufRead;
+    // match invoke_llama_cli(&full_prompt, stream).await {
+    //     Ok(Some(reader)) => {
+    //         let mut buf_reader = reader;
+    //         let mut aggregated_output = String::new();
+    //         let mut buffer = String::new();
+    //         use std::io::BufRead;
 
-            while buf_reader.read_line(&mut buffer).unwrap() > 0 {
-                if !buffer.trim().starts_with("> EOF by user") && !buffer.trim().is_empty() {
-                    print!("{}", buffer);
-                    aggregated_output.push_str(&buffer);
-                    aggregated_output.push('\n');
-                }
-                buffer.clear();
-            }
+    //         while buf_reader.read_line(&mut buffer).unwrap() > 0 {
+    //             if !buffer.trim().starts_with("> EOF by user") && !buffer.trim().is_empty() {
+    //                 print!("{}", buffer);
+    //                 aggregated_output.push_str(&buffer);
+    //                 aggregated_output.push('\n');
+    //             }
+    //             buffer.clear();
+    //         }
 
-            machine.consume(json!({"type": "exchange_created", "payload": {"prompt": new_prompt, "response": aggregated_output, "conversation": convo_id}}));
-        }
-        Ok(None) => println!("No output from process."),
-        Err(e) => eprintln!("Error executing external process: {}", e),
-    }
+    //         machine.consume(json!({"type": "exchange_created", "payload": {"prompt": new_prompt, "response": aggregated_output, "conversation": convo_id}}));
+    //     }
+    //     Ok(None) => println!("No output from process."),
+    //     Err(e) => eprintln!("Error executing external process: {}", e),
+    // }
 }
