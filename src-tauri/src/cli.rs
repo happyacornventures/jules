@@ -232,37 +232,6 @@ pub async fn run(args: Vec<String>) {
     }
 
     let mut rumi = Rumi::new();
-    let exchanges = rumi.get_exchanges();
-
-    let exchanges_values: &Value = exchanges.get("exchanges").unwrap();
-    let exchanges_values_map: HashMap<String, Value> =
-        serde_json::from_str(&exchanges_values.to_string()).unwrap();
-
-    let mut exchanges_iter = exchanges_values_map.iter();
-
-    let mut relevant_exchanges: Vec<Value> = Vec::new();
-
-    if let Some(ref convo_id) = convo_id {
-        for (_, exchange) in exchanges_iter {
-            if exchange["conversation"].as_str().unwrap() == convo_id {
-                relevant_exchanges.push(exchange.clone());
-            }
-        }
-    }
-
-    relevant_exchanges.sort_by_key(|e| e["createTime"].as_u64());
-    let full_convo: String = relevant_exchanges
-        .iter()
-        .map(|exchange| {
-            let prompt = exchange["prompt"].as_str().unwrap_or("");
-            let response = exchange["response"].as_str().unwrap_or("").trim();
-            format!(
-                "<|im_start|>user\n{}<|im_end|>\n<|im_start|>assistant\n{}<|im_end|>",
-                prompt, response
-            )
-        })
-        .collect::<Vec<String>>()
-        .join("\n");
 
     let mut context_content: String = String::new();
 
