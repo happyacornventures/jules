@@ -90,7 +90,7 @@ fn timestamp_interpreter(event: &Value) -> Value {
     json!(new_event)
 }
 
-struct Rumi {
+pub struct Rumi {
     machine: Machine,
 }
 
