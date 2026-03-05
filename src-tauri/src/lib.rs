@@ -13,6 +13,20 @@ async fn prompt(prompt: String) {
     };
 }
 
+#[tauri::command]
+fn dispatch(
+    _app: tauri::AppHandle,
+    event: String,
+    payload: Option<String>,
+    // machine: tauri::State<Machine>,
+) -> String {
+    println!("Dispatching event: {}", event);
+    serde_json::to_string(&json!({})).unwrap()
+    // let hydrated_event = hydrate_event(event.clone(), payload.as_deref().unwrap_or("{}"));
+    // let data = machine.other_consume(hydrated_event);
+    // serde_json::to_string(&data).unwrap()
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     let mut rumi = Rumi::new();
