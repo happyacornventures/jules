@@ -15,6 +15,8 @@ async fn prompt(prompt: String) {
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    let mut rumi = Rumi::new();
+
     tauri::Builder::default()
         .setup(|app| {
             if cfg!(debug_assertions) {
