@@ -126,7 +126,8 @@ impl Rumi {
     }
 
     fn get_exchanges(&self) -> HashMap<String, Value> {
-        self.machine.consume(json!({"type": "exchanges_requested", "payload": {}}))
+        self.machine
+            .consume(json!({"type": "exchanges_requested", "payload": {}}))
     }
 
     async fn chat(
