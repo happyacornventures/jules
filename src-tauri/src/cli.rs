@@ -224,15 +224,6 @@ pub async fn run(args: Vec<String>) {
         .and_then(|i| args[i].strip_prefix("--conversation="))
         .map(|s| s.to_string());
 
-    if !model_exists("models") {
-        if let Err(e) = download_model("models", "https://huggingface.co/Qwen/Qwen2-1.5B-Instruct-GGUF/resolve/main/qwen2-1_5b-instruct-q4_0.gguf?download=true").await {
-                eprintln!("Error downloading model: {}", e);
-                std::process::exit(1);
-            }
-    }
-
-    let mut rumi = Rumi::new();
-
     let mut context_content: String = String::new();
 
     if let Some(ctx) = &context {
@@ -256,5 +247,13 @@ pub async fn run(args: Vec<String>) {
         format!("{}\n\n{}", context_content, prompt)
     };
 
+    if !model_exists("models") {
+        if let Err(e) = download_model("models", "https://huggingface.co/Qwen/Qwen2-1.5B-Instruct-GGUF/resolve/main/qwen2-1_5b-instruct-q4_0.gguf?download=true").await {
+                eprintln!("Error downloading model: {}", e);
+                std::process::exit(1);
+            }
+    }
+
+    let mut rumi = Rumi::new();
     rumi.chat(new_prompt, stream, convo_id).await;
 }
