@@ -130,13 +130,13 @@ impl Rumi {
             .consume(json!({"type": "exchanges_requested", "payload": {}}))
     }
 
-    async fn chat(
+    pub async fn chat(
         &mut self,
         // full_prompt: String,
         new_prompt: String,
         stream: bool,
         convo_id: Option<String>,
-    ) {
+    ) -> String {
         // get existing exchanges
         let exchanges = self.get_exchanges();
 
@@ -200,10 +200,12 @@ impl Rumi {
                 }
 
                 self.machine.consume(json!({"type": "exchange_created", "payload": {"prompt": new_prompt, "response": aggregated_output, "conversation": convo_id}}));
+                return aggregated_output
             }
             Ok(None) => println!("No output from process."),
             Err(e) => eprintln!("Error executing external process: {}", e),
         }
+        "".to_string()
     }
 }
 
