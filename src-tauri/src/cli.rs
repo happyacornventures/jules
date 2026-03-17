@@ -95,7 +95,7 @@ pub struct Rumi {
 }
 
 impl Rumi {
-    fn new() -> Self {
+    pub fn new() -> Self {
         let data: HashMap<String, Value> = HashMap::from([("exchanges".to_string(), json!({}))]);
         let listeners: Vec<Box<dyn Fn(&str, &Value, &Value) + Send + Sync>> = Vec::new();
         let reducers: HashMap<String, (Value, fn(Value, Value) -> Value)> = HashMap::from([(
