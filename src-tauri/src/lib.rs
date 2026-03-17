@@ -6,6 +6,8 @@ mod jules;
 use serde_json::json;
 use crate::cli::Rumi;
 use jules::{download_model, invoke_llama_cli, model_exists};
+use tauri::Manager;
+use serde_json::Value;
 
 #[tauri::command]
 async fn prompt(prompt: String) {
@@ -16,14 +18,25 @@ async fn prompt(prompt: String) {
 }
 
 #[tauri::command]
-fn dispatch(
+async fn dispatch(
     _app: tauri::AppHandle,
     event: String,
     payload: Option<String>,
-    // machine: tauri::State<Machine>,
+    // rumi: tauri::State<Rumi>,
 ) -> String {
     println!("Dispatching event: {}", event);
-    serde_json::to_string(&json!({})).unwrap()
+
+    // extract payload.prompt
+    let prompt = serde_json::from_str::<Value>(payload.as_deref().unwrap_or("{}")).unwrap()["prompt"].as_str().unwrap_or("").to_string();
+    println!("Dispatching prompt: {}", prompt);
+
+    let mut rumi = Rumi::new();
+
+    let response = rumi.chat(prompt.clone(), true, None).await;
+    println!("Response: {}", response);
+
+    serde_json::to_string(&json!({"prompt": prompt.clone(), "response": response.clone()})).unwrap()
+
     // let hydrated_event = hydrate_event(event.clone(), payload.as_deref().unwrap_or("{}"));
     // let data = machine.other_consume(hydrated_event);
     // serde_json::to_string(&data).unwrap()
