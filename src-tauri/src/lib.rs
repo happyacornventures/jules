@@ -3,6 +3,8 @@ mod file;
 mod hermenia;
 mod jules;
 
+use serde_json::json;
+use crate::cli::Rumi;
 use jules::{download_model, invoke_llama_cli, model_exists};
 
 #[tauri::command]
