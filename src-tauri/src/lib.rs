@@ -55,6 +55,7 @@ pub fn run() {
                         .build(),
                 )?;
             }
+            app.manage(rumi);
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![prompt, dispatch])
