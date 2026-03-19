@@ -34,7 +34,6 @@ export default function Index() {
       )}
       <BaseForm
         schema={{
-          title: "Prompt",
           properties: {
             prompt: {
               type: "string",
@@ -42,6 +41,7 @@ export default function Index() {
               value: "",
             },
           },
+          submitText: "Send"
         }}
         onSubmit={data => {
             setExchange({...data, response: "..."});
