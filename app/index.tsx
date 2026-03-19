@@ -24,6 +24,7 @@ export default function Index() {
       style={{
         flex: 1,
       }}
+      p={20}
     >
       {Object.keys(exchange).length > 0 && (
         <>
