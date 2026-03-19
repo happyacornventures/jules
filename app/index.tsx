@@ -1,5 +1,6 @@
 import { invoke } from "@tauri-apps/api/core";
 
+import { useState } from "react";
 import {
   BaseForm,
   View
@@ -15,6 +16,8 @@ const dispatch = (event: string, payload: Record<string, unknown>) =>
     : Promise.resolve({ node: {} });
 
 export default function Index() {
+  const [exchange, setExchange] = useState<Record<string, unknown>>({});
+
   return (
     <View
       style={{
@@ -32,7 +35,11 @@ export default function Index() {
             },
           },
         }}
-        onSubmit={data => dispatch("form_submitted", data).then(console.log)}
+        onSubmit={data => {
+            setExchange({...data, response: "..."});
+            dispatch("form_submitted", data).then(setExchange)
+          }
+        }
       />
     </View>
   );
