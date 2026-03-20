@@ -39,3 +39,5 @@ yarn-error.*
 app-example
 
 src-tauri/exchanges.json
+src-tauri/binaries
+src-tauri/models
