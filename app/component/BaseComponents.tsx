@@ -99,6 +99,7 @@ const BaseFormField = ({
       keyboardType={
         type === "number" || type === "integer" ? "numeric" : "default"
       }
+      flexGrow={3}
     />
     </>
   // </YStack>
