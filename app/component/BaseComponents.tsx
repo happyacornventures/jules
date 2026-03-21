@@ -133,6 +133,7 @@ export const BaseForm = ({
           onSubmit(formData);
           setFormData({});
         }}
+        style={{ flexDirection: schema.display === "row" ? "row" : "column" }}
       >
         {schema.properties &&
           Object.entries(schema.properties ?? {})
