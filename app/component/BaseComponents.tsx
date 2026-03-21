@@ -169,7 +169,7 @@ export const BaseForm = ({
               ),
             )}
         <Form.Trigger asChild>
-          <Button marginTop="$4">{schema.submitText || "Submit"}</Button>
+          <Button marginTop={schema.display==="row" ? undefined : "$4"} marginLeft={schema.display==="row" ? "$4" : undefined}>{schema.submitText || "Submit"}</Button>
         </Form.Trigger>
       </Form>
     </>
