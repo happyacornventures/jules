@@ -87,7 +87,8 @@ const BaseFormField = ({
   value: unknown;
   handleChange: (key: string, value: unknown) => void;
 }) => (
-  <YStack key={fieldKey} gap="$2" marginVertical="$2">
+  // <YStack key={fieldKey} gap="$2" marginVertical="$2">
+  <>
     <Label htmlFor={fieldKey}>{title}</Label>
     <Input
       id={fieldKey}
@@ -99,7 +100,8 @@ const BaseFormField = ({
         type === "number" || type === "integer" ? "numeric" : "default"
       }
     />
-  </YStack>
+    </>
+  // </YStack>
 );
 
 export const BaseForm = ({
