@@ -136,7 +136,7 @@ impl Rumi {
         new_prompt: String,
         stream: bool,
         convo_id: Option<String>,
-    ) -> String {
+    ) -> HashMap<String, String> {
         // get existing exchanges
         let exchanges = self.get_exchanges();
 
@@ -200,12 +200,12 @@ impl Rumi {
                 }
 
                 self.machine.consume(json!({"type": "exchange_created", "payload": {"prompt": new_prompt, "response": aggregated_output, "conversation": convo_id}}));
-                return aggregated_output
+                return HashMap::from([("response".to_string(), aggregated_output), ("conversation".to_string(), convo_id.unwrap_or_default())]);
             }
             Ok(None) => println!("No output from process."),
             Err(e) => eprintln!("Error executing external process: {}", e),
         }
-        "".to_string()
+        HashMap::new()
     }
 }
 
