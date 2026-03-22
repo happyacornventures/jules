@@ -41,6 +41,7 @@ export default function Index() {
               value: "",
             },
           },
+          display: "row",
           submitText: "Send"
         }}
         onSubmit={data => {
