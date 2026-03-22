@@ -33,9 +33,9 @@ async fn dispatch(
     let mut rumi = Rumi::new();
 
     let response = rumi.chat(prompt.clone(), true, None).await;
-    println!("Response: {}", response);
+    println!("Response: {}", response["response"]);
 
-    serde_json::to_string(&json!({"prompt": prompt.clone(), "response": response.clone()})).unwrap()
+    serde_json::to_string(&json!({"prompt": prompt.clone(), "response": response["response"].clone(), "conversation": response["conversation"].clone()})).unwrap()
 
     // let hydrated_event = hydrate_event(event.clone(), payload.as_deref().unwrap_or("{}"));
     // let data = machine.other_consume(hydrated_event);
