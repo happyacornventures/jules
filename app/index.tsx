@@ -27,12 +27,12 @@ export default function Index() {
       }}
       p={20}
     >
-      {Object.keys(exchange).length > 0 && (
+      {Object.keys(exchange).length > 0 ? (
         <ScrollView style={{ flex: 1 }}>
           <Text maxWidth="75%" backgroundColor="$gray2" py={5} px={10} mt={5} borderRadius={10} alignSelf="flex-end">{(exchange?.prompt as string)?.trim()}</Text>
           <Text maxWidth="75%" backgroundColor="$gray4" py={5} px={10} mt={5} borderRadius={10} alignSelf="flex-start">{(exchange?.response as string)?.trim()}</Text>
         </ScrollView>
-      )}
+      ) : <View style={{ flex: 1 }} />}
       <BaseForm
         schema={{
           properties: {
