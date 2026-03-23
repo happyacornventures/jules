@@ -26,6 +26,17 @@ async fn dispatch(
 ) -> String {
     println!("Dispatching event: {}", event);
 
+    match event.as_str() {
+        "get_exchanges" => {
+            let mut rumi = Rumi::new();
+            let exchanges = rumi.get_exchanges();
+            return serde_json::to_string(&exchanges).unwrap()
+        }
+        _ => {
+            println!("Unknown command: {}", event);
+        }
+    }
+
     // extract payload.prompt
     let prompt = serde_json::from_str::<Value>(payload.as_deref().unwrap_or("{}")).unwrap()["prompt"].as_str().unwrap_or("").to_string();
     println!("Dispatching prompt: {}", prompt);
