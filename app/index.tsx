@@ -1,6 +1,6 @@
 import { invoke } from "@tauri-apps/api/core";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   BaseForm,
   ScrollView,
@@ -19,6 +19,10 @@ const dispatch = (event: string, payload: Record<string, unknown>) =>
 
 export default function Index() {
   const [exchange, setExchange] = useState<Record<string, unknown>[]>([]);
+
+  useEffect(() => {
+    dispatch("get_exchanges", {}).then(console.log);
+  }, []);
 
   return (
     <View
