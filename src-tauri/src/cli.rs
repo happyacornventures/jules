@@ -125,7 +125,7 @@ impl Rumi {
         Rumi { machine }
     }
 
-    fn get_exchanges(&self) -> HashMap<String, Value> {
+    pub fn get_exchanges(&self) -> HashMap<String, Value> {
         self.machine
             .consume(json!({"type": "exchanges_requested", "payload": {}}))
     }
