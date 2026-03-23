@@ -18,7 +18,7 @@ const dispatch = (event: string, payload: Record<string, unknown>) =>
     : Promise.resolve({ node: {} });
 
 export default function Index() {
-  const [exchange, setExchange] = useState<Record<string, unknown>>({});
+  const [exchange, setExchange] = useState<Record<string, unknown>[]>([]);
 
   return (
     <View
@@ -46,8 +46,8 @@ export default function Index() {
           submitText: "Send"
         }}
         onSubmit={data => {
-            setExchange({...data, response: "..."});
-            dispatch("form_submitted", data).then(setExchange)
+            setExchange([...exchange, {...data, response: "..."}]);
+            dispatch("form_submitted", data).then(data => setExchange((prev) => [...prev.slice(0, -1), data]));
           }
         }
       />
