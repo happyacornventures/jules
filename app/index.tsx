@@ -37,7 +37,7 @@ export default function Index() {
       }}
       p={20}
     >
-      {exchange.length > 0 ? exchange.map((item, index) => (
+      {exchange.filter(item => item.conversation === activeConversation).length > 0 ? exchange.filter(item => item.conversation === activeConversation).map((item, index) => (
         <ScrollView key={index} style={{ flex: 1 }}>
           <Text maxWidth="75%" backgroundColor="$gray2" py={5} px={10} mt={5} borderRadius={10} alignSelf="flex-end">{(item?.prompt as string)?.trim()}</Text>
           <Text maxWidth="75%" backgroundColor="$gray4" py={5} px={10} mt={5} borderRadius={10} alignSelf="flex-start">{(item?.response as string)?.trim()}</Text>
