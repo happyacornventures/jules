@@ -22,7 +22,9 @@ export default function Index() {
 
   useEffect(() => {
     dispatch("get_exchanges", {}).then(data => {
-      console.log(Object.values(data.exchanges).sort((a, b) => ((a as { createTime: number }).createTime) - ((b as { createTime: number }).createTime)));
+      const exchanges = [...Object.values(data.exchanges)];
+      exchanges.sort((a, b) => ((a as { createTime: number }).createTime) - ((b as { createTime: number }).createTime));
+      console.log(exchanges);
     });
   }, []);
 
