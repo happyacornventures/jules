@@ -21,7 +21,9 @@ export default function Index() {
   const [exchange, setExchange] = useState<Record<string, unknown>[]>([]);
 
   useEffect(() => {
-    dispatch("get_exchanges", {}).then(console.log);
+    dispatch("get_exchanges", {}).then(data => {
+      console.log(Object.values(data.exchanges).sort((a, b) => ((a as { createTime: number }).createTime) - ((b as { createTime: number }).createTime)));
+    });
   }, []);
 
   return (
