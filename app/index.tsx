@@ -26,6 +26,7 @@ export default function Index() {
       const exchanges = [...Object.values(data.exchanges)];
       exchanges.sort((a, b) => ((a as { createTime: number }).createTime) - ((b as { createTime: number }).createTime));
       console.log(exchanges);
+      setExchange(exchanges as Record<string, unknown>[]);
     });
   }, []);
 
