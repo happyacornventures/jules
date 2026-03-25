@@ -30,6 +30,8 @@ export default function Index() {
     });
   }, []);
 
+  console.log(exchange, activeConversation);
+
   return (
     <View
       style={{
