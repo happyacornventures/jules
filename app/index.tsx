@@ -19,7 +19,7 @@ const dispatch = (event: string, payload: Record<string, unknown>) =>
 
 export default function Index() {
   const [exchange, setExchange] = useState<Record<string, unknown>[]>([]);
-  const [activeConversation, setActiveConversation] = useState<string>("");
+  const [activeConversation, setActiveConversation] = useState<string>();
 
   useEffect(() => {
     dispatch("get_exchanges", {}).then(data => {
