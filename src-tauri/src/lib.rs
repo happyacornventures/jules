@@ -39,7 +39,12 @@ async fn dispatch(
 
     // extract payload.prompt
     let prompt = serde_json::from_str::<Value>(payload.as_deref().unwrap_or("{}")).unwrap()["prompt"].as_str().unwrap_or("").to_string();
-    println!("Dispatching prompt: {}", prompt);
+    let conversation = serde_json::from_str::<Value>(payload.as_deref().unwrap_or("{}"))
+        .unwrap()["conversation"]
+        .as_str()
+        .filter(|s| !s.is_empty())
+        .map(|s| s.to_string());
+    println!("Dispatching prompt: {} {:?}", prompt, conversation);
 
     let mut rumi = Rumi::new();
 
