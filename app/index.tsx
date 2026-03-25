@@ -57,7 +57,7 @@ export default function Index() {
         }}
         onSubmit={data => {
             setExchange([...exchange, {...data, response: "..."}]);
-            dispatch("form_submitted", data).then(data => setExchange((prev) => [...prev.slice(0, -1), data]));
+            dispatch("form_submitted", {...data, ...(activeConversation.length > 0 ? { conversation: activeConversation } : {})}).then(data => setExchange((prev) => [...prev.slice(0, -1), data]));
           }
         }
       />
