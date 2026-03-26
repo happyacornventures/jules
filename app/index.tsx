@@ -30,7 +30,7 @@ export default function Index() {
     });
   }, []);
 
-  console.log(exchange, activeConversation);
+  console.log(activeConversation);
 
   return (
     <View
