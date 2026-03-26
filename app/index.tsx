@@ -19,6 +19,7 @@ const dispatch = (event: string, payload: Record<string, unknown>) =>
 
 export default function Index() {
   const [exchange, setExchange] = useState<Record<string, unknown>[]>([]);
+  const [waiting, setWaiting] = useState(false);
   const [activeConversation, setActiveConversation] = useState<string>();
 
   useEffect(() => {
