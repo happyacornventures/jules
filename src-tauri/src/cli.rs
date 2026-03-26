@@ -199,7 +199,7 @@ impl Rumi {
                     buffer.clear();
                 }
 
-                self.machine.consume(json!({"type": "exchange_created", "payload": {"prompt": new_prompt, "response": aggregated_output, "conversation": convo_id}}));
+                let new_exchanges = self.machine.consume(json!({"type": "exchange_created", "payload": {"prompt": new_prompt, "response": aggregated_output, "conversation": convo_id}}));
                 return HashMap::from([("response".to_string(), aggregated_output), ("conversation".to_string(), convo_id.unwrap_or_default())]);
             }
             Ok(None) => println!("No output from process."),
