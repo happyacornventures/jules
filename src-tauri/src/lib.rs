@@ -48,8 +48,9 @@ async fn dispatch(
 
     let mut rumi = Rumi::new();
 
-    let response = rumi.chat(prompt.clone(), true, conversation).await;
+    let response = rumi.chat(prompt.clone(), true, None).await;
     println!("Response: {}", response["response"]);
+    println!("Conversation: {}", response["conversation"]);
 
     serde_json::to_string(&json!({"prompt": prompt.clone(), "response": response["response"].clone(), "conversation": response["conversation"].clone()})).unwrap()
 
